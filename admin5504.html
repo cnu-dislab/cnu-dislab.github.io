@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Publications Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts & Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@300;600;700&family=Roboto:wght@300;400;500;700&family=Material+Symbols+Outlined" rel="stylesheet">
+  <style>
+    /* 전역 리셋 및 기본 스타일 */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      background-color: #ffffff;
+      color: #000;
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+    }
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+    .wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    /* 메뉴 */
+    .menu {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      font-family: 'Rethink Sans', sans-serif;
+    }
+    .menu a {
+      text-decoration: none;
+      color: #002554;
+      font-size: clamp(14px, 2vw, 20px);
+      font-weight: 400;
+      transition: color 0.3s;
+    }
+    .menu a:hover {
+      color: #666;
+    }
+    .inner {
+      margin-top: 0;
+    }
+    /* 등록 폼 스타일 */
+    form {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    form label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-weight: bold;
+    }
+    form input[type="text"],
+    form select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    /* 발행일은 텍스트 입력으로 변경 (예: "Mar. 2024" 또는 "2024-03-01 ~ 2024-03-31") */
+    form input[type="date"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    /* 여기서는 type="text"로 사용 */
+    form input#date {
+      type: text;
+    }
+    form input[type="submit"] {
+      background-color: #002554;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    form input[type="submit"]:hover {
+      background-color: #004a80;
+    }
+    .message {
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    /* 테이블 스타일 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table th, table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    table th {
+      background-color: #f2f2f2;
+    }
+    /* 수정 버튼 스타일 */
+    button.editBtn {
+      background-color: #004a80;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button.editBtn:hover {
+      background-color: #002554;
+    }
+    /* 페이지네이션 (필요 시 추가) */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      margin-top: 2rem;
+    }
+    .pagination button {
+      background: none;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 1.2rem 1.5rem;
+      cursor: pointer;
+    }
+    .pagination button.arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pagination button.current {
+      font-weight: bold;
+      background-color: #ddd;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- 관리자 전용 메뉴 -->
+    <nav class="menu">
+      <a href="index.html">Home</a>
+      <a href="admin_members.html" class="admin-link">Members</a>
+      <a href="admin5504.html" class="admin-link">Publications</a>
+      <a href="admin_research.html" class="admin-link">Research</a>
+      <a href="admin_projects.html" class="admin-link">Projects</a>
+      <a href="admin_news.html" class="admin-link">News</a>
+      <a href="admin_contact.html" class="admin-link">Contact</a>
+    </nav>
+
+    <div class="inner">
+      <h2>논문 등록/수정 (관리자 전용)</h2>
+      <form id="paperForm">
+        <!-- 수정 시 사용되는 숨겨진 필드 -->
+        <input type="hidden" id="paperId" name="paperId" value="">
+        
+        <label for="url">논문 URL:</label>
+        <input type="text" id="url" name="url" required>
+
+        <label for="category">카테고리:</label>
+        <select id="category" name="category" required>
+          <option value="International Journal">International Journal</option>
+          <option value="International Conference">International Conference</option>
+          <option value="Domestic Journal">Domestic Journal</option>
+          <option value="Domestic Conference">Domestic Conference</option>
+        </select>
+
+        <label for="event">학회/학술대회명:</label>
+        <input type="text" id="event" name="event" required placeholder="예: IEEE TIFS 또는 해당 행사명">
+
+        <label for="title">논문 제목:</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="authors">저자명:</label>
+        <input type="text" id="authors" name="authors" required>
+
+        <label for="date">발행일 (연도/월 또는 시작일 ~ 종료일):</label>
+        <input type="text" id="date" name="date" required placeholder="예: Mar. 2024 또는 2024-03-01 ~ 2024-03-31">
+
+        <label for="publication">출판사/저널명:</label>
+        <input type="text" id="publication" name="publication" required>
+
+        <label for="tags">#태그 (쉼표 구분):</label>
+        <input type="text" id="tags" name="tags">
+
+        <input type="submit" value="등록/수정">
+      </form>
+      <div id="addMessage" class="message"></div>
+
+      <hr>
+      <!-- 등록된 논문 리스트 (삭제/수정용) -->
+      <h3>등록된 논문 리스트 (삭제/수정 가능)</h3>
+      <button id="refreshBtn">새로고침</button>
+      <button id="deleteBtn">선택 삭제</button>
+      <div id="deleteMessage" class="message"></div>
+      <table id="papersTable">
+        <thead>
+          <tr>
+            <th>선택</th>
+            <th>ID</th>
+            <th>제목</th>
+            <th>카테고리</th>
+            <th>학회/학술대회명</th>
+            <th>발행일</th>
+            <th>수정</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- JavaScript로 동적 생성 -->
+        </tbody>
+      </table>
+
+      <br>
+      <button id="logoutBtn">로그아웃</button>
+    </div>
+  </div>
+  
+  <script>
+    // 관리자 토큰 확인
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      alert('관리자 로그인이 필요합니다.');
+      window.location.href = 'login.html';
+    }
+
+    // 논문 등록/수정 처리
+    document.getElementById('paperForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      const paperId = document.getElementById('paperId').value;
+      const paperData = {
+        url: document.getElementById('url').value,
+        category: document.getElementById('category').value,
+        event: document.getElementById('event').value,
+        title: document.getElementById('title').value,
+        authors: document.getElementById('authors').value,
+        date: document.getElementById('date').value,
+        publication: document.getElementById('publication').value,
+        tags: document.getElementById('tags').value
+      };
+      let endpoint = 'https://www.nameyee.me/api/add_paper';
+      if(paperId){ // 수정 모드
+        paperData.id = parseInt(paperId);
+        endpoint = 'https://www.nameyee.me/api/update_paper';
+      }
+      fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(paperData)
+      })
+      .then(response => {
+        if (!response.ok) { throw new Error('등록/수정 실패'); }
+        return response.json();
+      })
+      .then(data => {
+        document.getElementById('addMessage').textContent = data.message;
+        document.getElementById('paperForm').reset();
+        document.getElementById('paperId').value = ''; // 수정 모드 초기화
+        loadPapers();
+      })
+      .catch(error => {
+        document.getElementById('addMessage').textContent = error.message;
+      });
+    });
+    
+    // 논문 리스트 로드 함수
+    function loadPapers(){
+      fetch('https://www.nameyee.me/api/publications')
+      .then(response => response.json())
+      .then(data => {
+        const tbody = document.getElementById('papersTable').querySelector('tbody');
+        tbody.innerHTML = '';
+        data.forEach(paper => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><input type="checkbox" class="deleteCheckbox" value="${paper.id}"></td>
+            <td>${paper.id}</td>
+            <td>${paper.title}</td>
+            <td>${paper.category}</td>
+            <td>${paper.event}</td>
+            <td>${paper.date}</td>
+            <td><button class="editBtn" data-id="${paper.id}">수정</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+        // 수정 버튼 이벤트 처리
+        document.querySelectorAll('.editBtn').forEach(button => {
+          button.addEventListener('click', function(){
+            const id = this.getAttribute('data-id');
+            fetch('https://www.nameyee.me/api/publications')
+              .then(response => response.json())
+              .then(data => {
+                const paper = data.find(item => item.id == id);
+                if(paper){
+                  document.getElementById('paperId').value = paper.id;
+                  document.getElementById('url').value = paper.url;
+                  document.getElementById('category').value = paper.category;
+                  document.getElementById('event').value = paper.event;
+                  document.getElementById('title').value = paper.title;
+                  document.getElementById('authors').value = paper.authors;
+                  document.getElementById('date').value = paper.date;
+                  document.getElementById('publication').value = paper.publication;
+                  document.getElementById('tags').value = paper.tags;
+                }
+              })
+              .catch(err => console.error('Error fetching paper for edit:', err));
+          });
+        });
+      })
+      .catch(err => {
+        console.error('Error loading papers:', err);
+      });
+    }
+    
+    document.getElementById('refreshBtn').addEventListener('click', loadPapers);
+    
+    // 선택 삭제 버튼
+    document.getElementById('deleteBtn').addEventListener('click', function(){
+      const checkboxes = document.querySelectorAll('.deleteCheckbox:checked');
+      const ids = Array.from(checkboxes).map(cb => parseInt(cb.value));
+      if(ids.length === 0){
+        alert('삭제할 논문을 선택하세요.');
+        return;
+      }
+      fetch('https://www.nameyee.me/api/delete_papers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ ids })
+      })
+      .then(response => {
+        if(!response.ok) { throw new Error('삭제 실패'); }
+        return response.json();
+      })
+      .then(data => {
+        document.getElementById('deleteMessage').textContent = data.message;
+        loadPapers();
+      })
+      .catch(error => {
+        document.getElementById('deleteMessage').textContent = error.message;
+      });
+    });
+    
+    // 로그아웃 처리
+    document.getElementById('logoutBtn').addEventListener('click', function(){
+      localStorage.removeItem('adminToken');
+      window.location.href = 'login.html';
+    });
+    
+    // 페이지 로드 시 논문 리스트 불러오기
+    loadPapers();
+  </script>
+</body>
+</html>

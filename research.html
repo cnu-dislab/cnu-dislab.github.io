@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Research - Distributed Intelligence & Systems Laboratory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts & Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@300;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* 기본 리셋 및 박스 모델 */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      background-color: #ffffff;
+      color: #000000;
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+    }
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+    /* 전체 래퍼 */
+    .wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    /* 최상단 메뉴 */
+    .menu {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      font-family: 'Rethink Sans', sans-serif;
+      margin-bottom: 2rem;
+    }
+    .menu a {
+      text-decoration: none;
+      color: #002554;
+      font-size: clamp(14px, 2vw, 20px);
+      font-weight: 400;
+      transition: color 0.3s;
+    }
+    .menu a:hover {
+      color: #666;
+    }
+    /* 내부 컨텐츠 */
+    .inner {
+      text-align: center;
+    }
+    .inner h1 {
+      margin-bottom: 2rem;
+    }
+    /* 2열 그리드 컨테이너 */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    /* 연구 카드 스타일 */
+    .research-card {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      overflow: hidden;
+      background-color: #fafafa;
+      transition: box-shadow 0.3s;
+    }
+    .research-card:hover {
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+    .research-card img {
+      width: 100%;
+      aspect-ratio: 2 / 1;
+      object-fit: cover;
+      display: block;
+    }
+    .research-content {
+      padding: 1rem;
+      margin-top: auto;
+    }
+    .research-title {
+      font-family: 'Rethink Sans', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      color: #333;
+    }
+    .research-desc {
+      font-size: 1rem;
+      line-height: 1.4;
+      color: #555;
+      margin: 0;
+    }
+    .research-desc p {
+      margin: 0.4rem 0;
+    }
+    /* 반응형: 모바일에서 1열 */
+    @media (max-width: 768px) {
+      .grid-container {
+        grid-template-columns: 1fr;
+      }
+      .menu {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- 최상단 메뉴 -->
+    <nav class="menu">
+      <a href="index.html">Home</a>
+      <a href="members.html">Members</a>
+      <a href="publications.html">Publications</a>
+      <a href="research.html">Research</a>
+      <a href="projects.html">Projects</a>
+      <a href="news.html">News</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    
+    <div class="inner">
+      <h1>Research</h1>
+      <div class="grid-container" id="researchContainer">
+        <!-- 연구 카드들이 동적으로 삽입됩니다. -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function loadResearch() {
+      fetch('https://www.nameyee.me/api/research')
+        .then(response => response.json())
+        .then(data => {
+          // 예시로 id 오름차순 정렬 (필요시 날짜 등 다른 기준으로 정렬 가능)
+          data.sort((a, b) => a.id - b.id);
+          const container = document.getElementById('researchContainer');
+          container.innerHTML = '';
+          data.forEach(item => {
+            // description은 줄바꿈(\n) 기준으로 <p> 태그로 변환
+            const paragraphs = item.description ? item.description.split('\n').map(p => `<p>${p.trim()}</p>`).join('') : '';
+            const card = document.createElement('div');
+            card.className = 'research-card';
+            card.innerHTML = `
+              <img src="${item.image}" alt="${item.title}">
+              <div class="research-content">
+                <h2 class="research-title">${item.title}</h2>
+                <div class="research-desc">${paragraphs}</div>
+              </div>
+            `;
+            container.appendChild(card);
+          });
+        })
+        .catch(err => console.error('Error loading research items:', err));
+    }
+    loadResearch();
+  </script>
+</body>
+</html>
