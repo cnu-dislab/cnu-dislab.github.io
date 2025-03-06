@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Projects - Distributed Intelligence & Systems Laboratory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Fonts & Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@300;600;700&family=Roboto:wght@300;400;500;700&family=Material+Symbols+Outlined" rel="stylesheet">
+  <style>
+    /* 기본 리셋 및 박스 모델 */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      background-color: #ffffff;
+      color: #000000;
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+    }
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+    .wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .menu {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      font-family: 'Rethink Sans', sans-serif;
+      margin-bottom: 2rem;
+    }
+    .menu a {
+      text-decoration: none;
+      color: #002554;
+      font-size: clamp(14px, 2vw, 20px);
+      font-weight: 400;
+      transition: color 0.3s;
+    }
+    .menu a:hover {
+      color: #666;
+    }
+    .inner {
+      /* 필요시 margin-top 추가 */
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #002554;
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      align-items: stretch;
+    }
+    .project-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+    .project-card-inner {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 1rem;
+      background-color: #fafafa;
+      transition: box-shadow 0.3s;
+      height: 100%;
+    }
+    .project-card-inner:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .project-title {
+      font-family: 'Rethink Sans', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin: 0.5rem 0;
+      color: #333;
+    }
+    .project-info {
+      font-size: 0.9rem;
+      color: #555;
+      margin: 0.5rem 0;
+      line-height: 1.4;
+    }
+    .project-duration {
+      margin-bottom: 0.5rem;
+    }
+    @media (max-width: 768px) {
+      .menu {
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+      }
+      .grid-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- 최상단 메뉴 -->
+    <nav class="menu">
+      <a href="index.html">Home</a>
+      <a href="members.html">Members</a>
+      <a href="publications.html">Publications</a>
+      <a href="research.html">Research</a>
+      <a href="projects.html">Projects</a>
+      <a href="news.html">News</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    
+    <div class="inner">
+      <h1>Projects</h1>
+      <div class="grid-container" id="projectsContainer">
+        <!-- 프로젝트 카드들이 동적으로 삽입됩니다. -->
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function loadProjects() {
+      fetch('https://www.nameyee.me/api/projects')
+        .then(response => response.json())
+        .then(data => {
+          const container = document.getElementById('projectsContainer');
+          container.innerHTML = '';
+          data.forEach(item => {
+            const card = document.createElement('a');
+            card.href = "#";  // 필요 시 세부 페이지 링크 지정
+            card.className = 'project-card';
+            card.innerHTML = `
+              <div class="project-card-inner">
+                ${item.image ? `<img src="${item.image}" alt="${item.title}" style="width:100%; height:auto; margin-bottom:1rem;">` : ''}
+                <h3 class="project-title">${item.title}</h3>
+                <div class="project-info">
+                  <div class="project-duration"><strong>Duration:</strong> ${item.start_month} ~ ${item.end_month}</div>
+                  <div class="project-funding"><strong>Funding:</strong> ${item.funding}</div>
+                </div>
+              </div>
+            `;
+            container.appendChild(card);
+          });
+        })
+        .catch(err => console.error('Error loading projects:', err));
+    }
+    loadProjects();
+  </script>
+</body>
+</html>
