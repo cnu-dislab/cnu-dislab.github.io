@@ -1,221 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Open Graph meta tags -->
-  <meta property="og:url" content="https://dislab5504.github.io/index.html">
-  <meta property="og:title" content="CNU DIS LAB">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="https://github.com/dislab5504/dislab5504.github.io/blob/main/assets/thumb.JPG">
-  <meta property="og:description" content="Welcome to our laboratory website. Exploring cutting-edge research in artificial intelligence, machine learning, and distributed systems.">
   <meta charset="UTF-8">
-  <title>Distributed Intelligence &amp; Systems Laboratory</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Rethink Sans 폰트 로드 (가중치 300, 600, 700 사용, Variable 포함) -->
-  <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@300;600;700&display=swap" rel="stylesheet">
-
-  <!-- three.js, Vanta.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <!-- 실제 환경에 맞춰 Vanta.js 경로 수정 -->
-  <script src="./dist/vanta.net.min.js"></script>
-
-  <style>
-    /* 기본 리셋 및 폰트 적용 */
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      font-family: 'Rethink Sans', sans-serif;
-      background-color: #002554; /* Pantone 655C 근사값 */
-      color: #ffffff;
-      box-sizing: border-box;
-    }
-    *, *::before, *::after {
-      box-sizing: inherit;
-    }
-
-    /* Vanta.js 전체 화면 컨테이너 */
-    .vanta-container {
-      position: relative;
-      width: 100%;
-      height: 100vh;  /* 화면 전체 높이를 Vanta가 차지하도록 */
-      overflow: hidden;
-    }
-    .vanta-bg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1; /* 내용 뒤에 위치 */
-    }
-
-    /* 전체를 감싸는 래퍼: 가로 폭 제한 & 좌우 패딩 */
-    .wrapper {
-      display: flex;
-      align-items: center;            /* 수직 가운데 정렬 */
-      justify-content: space-between; /* 왼쪽: 콘텐츠, 오른쪽: 메뉴 */
-      width: 100%;
-      height: 100%;
-      max-width: 2560px;             /* 요청에 따른 최대 폭 */
-      margin: 0 auto;
-      padding: 2rem;                 /* 좌우 간격을 넉넉히 */
-    }
-
-    /* 왼쪽 콘텐츠 */
-    .content {
-      max-width: 1200px;             /* 콘텐츠 폭 (필요 시 조정) */
-      text-align: left;
-    }
-    /* 로고 크기: 더 크게 조정 */
-    .logo {
-      width: clamp(120px, 15vh, 200px);
-      margin-bottom: 2vh;
-    }
-
-    /* 연구실 이름: Bold(700) */
-    h1 {
-      margin: 0;
-      font-size: clamp(40px, 7vw, 80px); /* 최소 40px ~ 최대 80px */
-      font-weight: 700;
-      line-height: 1.2;
-    }
-
-    /* @ChungNam National University: Semi-Bold(600) */
-    .semi-bold {
-      font-size: clamp(20px, 3vw, 40px);
-      font-weight: 600;
-      margin-top: 1rem;
-      display: block;
-    }
-
-    /* 설명 텍스트: 폰트 사이즈 줄임 */
-    .desc {
-      font-size: clamp(16px, 2.5vw, 32px);
-      font-weight: 200;
-      line-height: 1.4;
-      margin: 1rem 0 0 0;
-    }
-
-    /* 오른쪽 메뉴 */
-    .menu {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 2vh; /* 메뉴 항목 간 간격 */
-    }
-    .menu a {
-      color: #ffffff;
-      text-decoration: none;
-      font-size: clamp(18px, 3vw, 32px);
-      font-weight: 400;
-      transition: color 0.3s;
-    }
-    .menu a:hover {
-      color: #ccc;
-    }
-
-    /* About Us 섹션 스타일 */
-    .about-section {
-      background-color: #002554;  /* 전체 페이지와 동일한 배경색 */
-      color: #ffffff;
-      padding: 4rem 2rem;        /* 내용이 잘 보이도록 여백 추가 */
-      max-width: 2560px;         /* 상단 wrapper와 동일한 최대 폭 기준 */
-      margin: 0 auto;
-    }
-    .about-section h2 {
-      font-size: clamp(30px, 5vw, 50px);
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-    }
-    .about-section p {
-      font-size: clamp(16px, 2vw, 24px);
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-    }
-    .about-section h3 {
-      font-size: clamp(20px, 3vw, 32px);
-      font-weight: 600;
-      margin-top: 2rem;
-      margin-bottom: 1rem;
-    }
-  </style>
+  <title>Distributed Intelligence &amp; Systems Laboratory</title>
+  <meta name="description" content="Distributed Intelligence &amp; Systems Laboratory at Chungnam National University: research in distributed learning, trustworthy AI and AI-native 6G.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cnu-dislab.github.io/">
+  <meta property="og:title" content="Distributed Intelligence &amp; Systems Laboratory">
+  <meta property="og:description" content="Distributed Intelligence &amp; Systems Laboratory at Chungnam National University: research in distributed learning, trustworthy AI and AI-native 6G.">
+  <meta property="og:image" content="https://cnu-dislab.github.io/assets/thumb.JPG">
+  <link rel="icon" type="image/png" href="src/img/cnu_logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;family=Rethink+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body>
-  <!-- 상단(첫 화면) 영역 -->
-  <div class="vanta-container" id="vanta-area">
-    <div class="vanta-bg"></div>
-
-    <!-- 좌: 콘텐츠, 우: 메뉴 -->
-    <div class="wrapper">
-      <!-- 왼쪽 콘텐츠 -->
-      <div class="content">
-        <img
-          src="https://raw.githubusercontent.com/dislab5504/dislab5504.github.io/main/src/img/cnu_logo.png"
-          alt="CNU Logo"
-          class="logo"
-        >
-        <h1>Distributed Intelligence &amp; Systems Laboratory</h1>
-        
-        <!-- @ChungNam National University -->
-        <div class="semi-bold">@Chungnam National University</div>
-        
-        <!-- 설명 텍스트 -->
-        <div class="desc">
-          Welcome to our laboratory website.<br>
-          Exploring cutting-edge research in distributed intelligence and systems.<br>
-           
-        </div>
-      </div>
-
-      <!-- 오른쪽 메뉴 -->
-      <nav class="menu">
-        <a href="#">Home</a>
+  <header class="site-header site-header--overlay">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="DIS Lab home">
+        <img src="src/img/lab_logo.png" width="1280" height="500" alt="Distributed Intelligence &amp; Systems Lab, Chungnam National University">
+      </a>
+      <button type="button" class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span></button>
+      <nav id="site-nav" class="site-nav" aria-label="Main">
+        <a href="index.html" aria-current="page">Home</a>
         <a href="members.html">Members</a>
-        <a href="publications.html">Publications</a>
         <a href="research.html">Research</a>
+        <a href="publications.html">Publications</a>
         <a href="projects.html">Projects</a>
-        
+        <a href="lectures.html">Lectures</a>
         <a href="news.html">News</a>
-        <!-- Contact 메뉴 추가 -->
         <a href="contact.html">Contact</a>
       </nav>
     </div>
-  </div>
-  
-  <!-- Updated About Us Section -->
-  <!-- Updated About Us Section with Larger List Font -->
-  <section class="about-section">
-    <h2>About Us</h2>
-    <p>
-      Our lab is dedicated to advancing the frontiers of distributed intelligence &amp; systems, with a particular focus on solving complex, real-world problems. We develop innovative techniques in distributed learning to enable efficient and privacy-preserving AI applications. We also focus on trustworthy AI including machine unlearning and robust methods for secure, fair, and reliable AI systems. We also explore AI-native 6G physical layer design and machine learning techniques to time-series prediction in video games.
-    </p>
-    <h3>Key Research Areas</h3>
-    <ul style="font-size: clamp(18px, 2.5vw, 28px); line-height: 1.6; margin-left: 20px;">
-      <li>Distributed learning for scalable and privacy-preserving AI</li>
-      <li>Trustworthy AI, including machine unlearning and Byzantine-robust distributed computing techniques</li>
-      <li>AI-native 6G physical layer design, focusing on deep learning-based channel prediction</li>
-      <li>Time-series prediction for video games and interactive applications</li>
-    </ul>
-  </section>
+  </header>
+  <main>
+    <section class="hero" id="hero">
+      <div class="hero-bg" id="hero-bg" aria-hidden="true"></div>
+      <div class="container">
+        <p class="hero-kicker">@Chungnam National University</p>
+        <h1>Distributed Intelligence &amp; Systems Laboratory</h1>
+        <p class="hero-desc">Welcome to our laboratory website. Exploring cutting-edge research in distributed intelligence and systems.</p>
+        <div class="hero-actions">
+          <a class="btn btn--primary" href="research.html">Our research</a>
+          <a class="btn btn--ghost" href="publications.html">Publications</a>
+        </div>
+      </div>
+    </section>
 
+    <section class="section" id="about">
+      <div class="container about-grid">
+        <div>
+          <h2 class="section-title">About Us</h2>
+          <p>Our lab is dedicated to advancing the frontiers of distributed intelligence &amp; systems, with a particular focus on solving complex, real-world problems. We develop innovative techniques in distributed learning to enable efficient and privacy-preserving AI applications. We also focus on trustworthy AI including machine unlearning and robust methods for secure, fair, and reliable AI systems. We also explore AI-native 6G physical layer design and machine learning techniques to time-series prediction in video games.</p>
+        </div>
+        <div>
+          <h2 class="section-title">Key Research Areas</h2>
+          <ul class="area-list">
+            <li>Distributed learning for scalable and privacy-preserving AI</li>
+            <li>Trustworthy AI, including machine unlearning and Byzantine-robust distributed computing techniques</li>
+            <li>AI-native 6G physical layer design, focusing on deep learning-based channel prediction</li>
+            <li>Time-series prediction for video games and interactive applications</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-  <!-- Vanta.js 초기화 스크립트 -->
+    <section class="section section--alt" id="latest-news">
+      <div class="container">
+        <div class="section-head">
+          <h2 class="section-title">Latest News</h2>
+          <a href="news.html">All news &rarr;</a>
+        </div>
+        <div id="homeNews"></div>
+      </div>
+    </section>
+
+    <section class="section" id="join">
+      <div class="container">
+        <div class="cta">
+          <div>
+            <h2>Join us</h2>
+            <p>We are recruiting passionate and self-motivated undergraduate and graduate students and post-doctoral researchers. If you are interested, please contact us with a brief self-introduction at <a href="mailto:hcyang@cnu.ac.kr">hcyang@cnu.ac.kr</a>.</p>
+          </div>
+          <a class="btn btn--primary" href="contact.html">How to apply</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="src/img/lab_logo.png" width="1280" height="500" alt="" loading="lazy">
+        <p>Distributed Intelligence &amp; Systems Laboratory</p>
+        <p>Chungnam National University</p>
+      </div>
+      <div>
+        <h2>Prof. Heecheol Yang</h2>
+        <p>Tel. 042-821-6656</p>
+        <p><a href="mailto:hcyang@cnu.ac.kr">hcyang@cnu.ac.kr</a></p>
+        <p>Rm. 522, Engineering Unit 5 (W2)</p>
+      </div>
+      <div>
+        <h2>Laboratory</h2>
+        <p>Tel. 042-821-7290</p>
+        <p>Rm. 504, Engineering Unit 5 (W2)</p>
+        <p>99 Daehak-ro, Yuseong-gu, Daejeon, Korea [34134]</p>
+      </div>
+    </div>
+    <div class="container footer-bottom"><span>&copy; DIS Lab, Chungnam National University</span></div>
+  </footer>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/site.js"></script>
   <script>
-    VANTA.NET({
-      el: "#vanta-area",
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-      minHeight: 200.00,
-      minWidth: 200.00,
-      scale: 1.00,
-      scaleMobile: 1.00,
-      color: 0xffffff,         // 라인 색상
-      backgroundColor: 0x002554, // Pantone 655C 헥스 코드
-      points: 20               // points 설정
+    DISLAB.load({
+      target: 'homeNews',
+      paths: ['/api/news'],
+      label: 'the latest news',
+      skeletonCount: 2,
+      render: function (news) {
+        var el = document.getElementById('homeNews');
+        var items = DISLAB.sortNews(news).slice(0, 3);
+        el.innerHTML = items.length
+          ? '<ul class="news-list">' + items.map(DISLAB.newsItemHTML).join('') + '</ul>'
+          : DISLAB.emptyHTML('No news yet', 'Announcements will appear here.');
+      }
     });
+
+    /* Animated network background: purely decorative, loaded after the content
+       and skipped when the visitor prefers reduced motion or WebGL is missing. */
+    (function () {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) { return; }
+      function add(src, next) {
+        var s = document.createElement('script');
+        s.src = src; s.onload = next;
+        document.body.appendChild(s);
+      }
+      window.addEventListener('load', function () {
+        add('three.min.js', function () {
+          add('dist/vanta.net.min.js', function () {
+            try {
+              VANTA.NET({
+                el: '#hero-bg',
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 200.0,
+                minWidth: 200.0,
+                scale: 1.0,
+                scaleMobile: 1.0,
+                color: 0xffffff,
+                backgroundColor: 0x002554,
+                points: 20
+              });
+            } catch (e) { /* the plain navy hero remains */ }
+          });
+        });
+      });
+    })();
   </script>
 </body>
 </html>

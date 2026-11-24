@@ -278,6 +278,7 @@
     </div>
   </div>
   
+  <script src="assets/js/config.js"></script>
   <script>
     // 관리자 토큰 확인
     const token = localStorage.getItem('adminToken');
@@ -288,7 +289,7 @@
 
     // 교수 정보 불러오기
     function loadProfessor(){
-      fetch('https://www.nameyee.me/api/professor')
+      fetch(window.DISLAB_API_BASE + '/api/professor')
       .then(response => response.json())
       .then(data => {
         if(data && Object.keys(data).length > 0){
@@ -323,7 +324,7 @@
         honors: document.getElementById('profHonors').value,
         academic_activities: document.getElementById('profActivities').value
       };
-      fetch('https://www.nameyee.me/api/professor', {
+      fetch(window.DISLAB_API_BASE + '/api/professor', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -353,7 +354,7 @@
         github: document.getElementById('studentGithub').value,
         level: document.getElementById('studentLevel').value
       };
-      fetch('https://www.nameyee.me/api/add_student', {
+      fetch(window.DISLAB_API_BASE + '/api/add_student', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -377,7 +378,7 @@
     
     // 학생 리스트 로드 함수
     function loadStudents(){
-      fetch('https://www.nameyee.me/api/students')
+      fetch(window.DISLAB_API_BASE + '/api/students')
       .then(response => response.json())
       .then(data => {
         const tbody = document.getElementById('studentTable').querySelector('tbody');
@@ -411,7 +412,7 @@
         alert('삭제할 학생을 선택하세요.');
         return;
       }
-      fetch('https://www.nameyee.me/api/delete_students', {
+      fetch(window.DISLAB_API_BASE + '/api/delete_students', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

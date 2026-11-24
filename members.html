@@ -2,340 +2,177 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Members - Distributed Intelligence &amp; Systems Laboratory</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- 폰트: Rethink Sans (메뉴 전용), Roboto (본문용) 및 Material Symbols -->
-  <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@300;600;700&family=Roboto:wght@300;400;500;700&family=Material+Symbols+Outlined" rel="stylesheet">
-  <style>
-    /* 전역 리셋 및 박스 모델 설정 */
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      min-height: 100%;
-      background-color: #ffffff;
-      color: #000000;
-      box-sizing: border-box;
-    }
-    *, *::before, *::after {
-      box-sizing: inherit;
-    }
-    body {
-      font-family: 'Roboto', sans-serif;
-    }
-    .wrapper {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-    /* 메뉴 */
-    .menu {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-    .menu a {
-      font-family: 'Rethink Sans', sans-serif;
-      text-decoration: none;
-      color: #002554;
-      font-size: clamp(14px, 2vw, 20px);
-      font-weight: 400;
-      transition: color 0.3s;
-    }
-    .menu a:hover {
-      color: #666;
-    }
-    /* Material Symbols 아이콘 */
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
-      font-size: 18px;
-      vertical-align: middle;
-      margin-right: 4px;
-    }
-    /* 메인 콘텐츠 영역 */
-    .content {
-      width: 100%;
-    }
-    /* 섹션 제목 스타일 */
-    .section-title {
-      text-align: center;
-      font-size: clamp(20px, 4vw, 32px);
-      font-weight: 700;
-      margin: 2rem 0 1.5rem 0;
-      color: #002554;
-    }
-    /* 교수 정보 테이블 */
-    .prof-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 1rem;
-      margin-bottom: 2rem;
-    }
-    .prof-table td {
-      vertical-align: top;
-      border: 1px solid #ccc;
-      padding: 1rem;
-    }
-    .prof-photo {
-      display: block;
-      margin: 0 auto 1rem auto;
-      width: clamp(100px, 15vw, 200px);
-      border-radius: 4px;
-    }
-    .prof-info {
-      text-align: center;
-    }
-    .prof-info h1 {
-      margin: 0 0 1rem 0;
-      font-size: clamp(16px, 3vw, 30px);
-      font-weight: 700;
-      color: #002554;
-    }
-    .prof-info .subtitle {
-      margin: 0 0 1rem 0;
-      font-size: clamp(14px, 2.5vw, 24px);
-      font-weight: 600;
-      color: #333;
-    }
-    .prof-info .info-line {
-      margin: 0.3rem 0;
-      font-size: clamp(12px, 2vw, 16px);
-      font-weight: 400;
-      line-height: 1.4;
-    }
-    /* 정보 카드 (교수 세부 정보) */
-    .info-cards {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-      margin: 1rem 0 2rem 0;
-    }
-    .card {
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 1rem;
-      text-align: center;
-      min-height: 225px;
-      box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
-    }
-    .card h2 {
-      margin: 0 0 1rem 0;
-      font-size: clamp(16px, 2vw, 20px);
-      font-weight: 600;
-      color: #000;
-    }
-    .card ul {
-      margin: 0;
-      padding-left: 1.2rem;
-      list-style-type: disc;
-      text-align: left;
-    }
-    .card li {
-      margin: 0.3rem 0;
-      color: #777;
-      font-size: clamp(14px, 2vw, 16px);
-      line-height: 1.4;
-    }
-    /* 석사 학생 카드: 2열 그리드 */
-    .master-students {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-    /* 학부 학생 카드: 4열 그리드 */
-    .undergrad-students {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-    .student-card {
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 1rem;
-      text-align: center;
-      box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
-    }
-    .student-photo-container {
-      height: 220px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 0.5rem;
-    }
-    .student-photo {
-      max-height: 100%;
-      width: auto;
-      object-fit: contain;
-    }
-    .student-name {
-      font-size: 1.2em;
-      font-weight: bold;
-      margin-top: 0.5rem;
-      margin-bottom: 0.3rem;
-    }
-    .student-contact {
-      font-size: 0.9em;
-      color: #555;
-      margin-top: 0.2rem;
-      margin-bottom: 0.1rem;
-    }
-    .email-contact {
-      margin-bottom: 0.1rem;
-    }
-    .github-contact {
-      margin-top: 0.1rem;
-    }
-    /* 미디어 쿼리: 화면 폭이 768px 이하일 때 */
-@media (max-width: 768px) {
-  .master-students {
-    grid-template-columns: 1fr; /* 석사 학생은 1열로 */
-  }
-  .undergrad-students {
-    grid-template-columns: repeat(2, 1fr); /* 학부 학생은 2열로 */
-  }
-}
-  </style>
+  <title>Members - Distributed Intelligence &amp; Systems Laboratory</title>
+  <meta name="description" content="The people of the Distributed Intelligence &amp; Systems Laboratory.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cnu-dislab.github.io/members.html">
+  <meta property="og:title" content="Members - Distributed Intelligence &amp; Systems Laboratory">
+  <meta property="og:description" content="The people of the Distributed Intelligence &amp; Systems Laboratory.">
+  <meta property="og:image" content="https://cnu-dislab.github.io/assets/thumb.JPG">
+  <link rel="icon" type="image/png" href="src/img/cnu_logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;family=Rethink+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body>
-  <div class="wrapper">
-    <!-- 상단 메뉴 -->
-    <nav class="menu">
-      <a href="index.html">Home</a>
-      <a href="members.html">Members</a>
-      <a href="publications.html">Publications</a>
-      <a href="research.html">Research</a>
-      <a href="projects.html">Projects</a>
-      <a href="news.html">News</a>
-      <a href="contact.html">Contact</a>
-    </nav>
-
-    <div class="content">
-      <!-- 교수 정보 섹션 -->
-      <div class="section-title">Professor</div>
-      <div id="professorContainer">
-        <!-- 교수 정보가 API에서 동적으로 불러와집니다. -->
-      </div>
-
-      <!-- 석사 과정 학생 섹션 (2열) -->
-      <div class="section-title">Master Graduate Students</div>
-      <div id="masterContainer" class="master-students">
-        <!-- 석사 학생 카드들이 동적으로 생성됩니다. -->
-      </div>
-
-      <!-- 학부 연구생 섹션 (4열) -->
-      <div class="section-title">Undergraduate Research Students</div>
-      <div id="undergradContainer" class="undergrad-students">
-        <!-- 학부 학생 카드들이 동적으로 생성됩니다. -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="DIS Lab home">
+        <img src="src/img/lab_logo.png" width="1280" height="500" alt="Distributed Intelligence &amp; Systems Lab, Chungnam National University">
+      </a>
+      <button type="button" class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span></button>
+      <nav id="site-nav" class="site-nav" aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="members.html" aria-current="page">Members</a>
+        <a href="research.html">Research</a>
+        <a href="publications.html">Publications</a>
+        <a href="projects.html">Projects</a>
+        <a href="lectures.html">Lectures</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="page-head">
+      <div class="container">
+        <h1>Members</h1>
+        <p>The people of the Distributed Intelligence &amp; Systems Laboratory.</p>
       </div>
     </div>
-  </div>
-
+    <section class="section">
+      <div class="container" id="membersRoot"></div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="src/img/lab_logo.png" width="1280" height="500" alt="" loading="lazy">
+        <p>Distributed Intelligence &amp; Systems Laboratory</p>
+        <p>Chungnam National University</p>
+      </div>
+      <div>
+        <h2>Prof. Heecheol Yang</h2>
+        <p>Tel. 042-821-6656</p>
+        <p><a href="mailto:hcyang@cnu.ac.kr">hcyang@cnu.ac.kr</a></p>
+        <p>Rm. 522, Engineering Unit 5 (W2)</p>
+      </div>
+      <div>
+        <h2>Laboratory</h2>
+        <p>Tel. 042-821-7290</p>
+        <p>Rm. 504, Engineering Unit 5 (W2)</p>
+        <p>99 Daehak-ro, Yuseong-gu, Daejeon, Korea [34134]</p>
+      </div>
+    </div>
+    <div class="container footer-bottom"><span>&copy; DIS Lab, Chungnam National University</span></div>
+  </footer>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/site.js"></script>
   <script>
-    // 교수 정보 로드
-    function loadProfessor(){
-      fetch('https://www.nameyee.me/api/professor')
-        .then(response => response.json())
-        .then(data => {
-          console.log("Professor data:", data);
-          const container = document.getElementById('professorContainer');
-          container.innerHTML = `
-            <table class="prof-table">
-              <tr>
-                <td>
-                  <img src="${data.photo}" alt="Professor ${data.name}" class="prof-photo">
-                  <div class="prof-info">
-                    <h1>${data.name}</h1>
-                    <div class="subtitle">${data.position}</div>
-                    <div class="info-line">
-                      <a href="mailto:${data.email}" style="text-decoration:none; color:inherit;">
-                        <span class="material-symbols-outlined">mail</span> ${data.email}
-                      </a>
-                    </div>
-                    <div class="info-line">
-                      <span class="material-symbols-outlined">phone</span> ${data.phone || 'Not provided'}
-                    </div>
-                    <div class="info-line">
-                      <span class="material-symbols-outlined">location_on</span> ${data.address || 'Not provided'}
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </table>
-            <div class="info-cards">
-              <div class="card">
-                <h2>Education</h2>
-                <ul>
-                  ${data.education ? data.education.split(';').map(item => `<li>${item.trim()}</li>`).join('') : '<li>No data</li>'}
-                </ul>
-              </div>
-              <div class="card">
-                <h2>Research Experience</h2>
-                <ul>
-                  ${data.research_experience ? data.research_experience.split(';').map(item => `<li>${item.trim()}</li>`).join('') : '<li>No data</li>'}
-                </ul>
-              </div>
-              <div class="card">
-                <h2>Honors and Awards</h2>
-                <ul>
-                  ${data.honors ? data.honors.split(';').map(item => `<li>${item.trim()}</li>`).join('') : '<li>No data</li>'}
-                </ul>
-              </div>
-              <div class="card">
-                <h2>Academic Activities</h2>
-                <ul>
-                  ${data.academic_activities ? data.academic_activities.split(';').map(item => `<li>${item.trim()}</li>`).join('') : '<li>No data</li>'}
-                </ul>
-              </div>
-            </div>
-          `;
-        })
-        .catch(err => console.error('Error loading professor info:', err));
-    }
+    (function () {
+      var esc = DISLAB.esc;
+      var ICON = {
+        mail: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>',
+        phone: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',
+        pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+        code: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg>'
+      };
+      /* Section order and headings; any other level value gets its own section after these. */
+      var LEVELS = [
+        ['Postdoc', 'Postdoctoral Researchers'],
+        ['Ph.D.', 'Ph.D. Students'],
+        ['PhD', 'Ph.D. Students'],
+        ['Integrated', 'Integrated M.S./Ph.D. Students'],
+        ['Master', 'Master’s Students'],
+        ['Undergraduate', 'Undergraduate Research Students'],
+        ['Alumni', 'Alumni']
+      ];
 
-    // 학생 정보 로드 (전체 학생 데이터를 받아 level에 따라 석사, 학부로 분리)
-    function loadStudents(){
-      fetch('https://www.nameyee.me/api/students')
-        .then(response => response.json())
-        .then(data => {
-          const masterContainer = document.getElementById('masterContainer');
-          const undergradContainer = document.getElementById('undergradContainer');
-          masterContainer.innerHTML = '';
-          undergradContainer.innerHTML = '';
-          data.forEach(student => {
-            const card = document.createElement('div');
-            card.className = 'student-card';
-            card.innerHTML = `
-              <div class="student-photo-container">
-                <img src="${student.photo}" alt="${student.name}" class="student-photo">
-              </div>
-              <div class="student-name">${student.name}</div>
-              <div class="student-contact email-contact">
-                <a href="mailto:${student.email}" style="text-decoration:none; color:inherit;">
-                  <span class="material-symbols-outlined">mail</span> ${student.email}
-                </a>
-              </div>
-              <div class="student-contact github-contact">
-                <a href="${student.github}" target="_blank" style="text-decoration:none; color:inherit;">
-                  <span class="material-symbols-outlined">code</span> ${student.github}
-                </a>
-              </div>
-            `;
-            if(student.level === "Master"){
-              masterContainer.appendChild(card);
-            } else if(student.level === "Undergraduate"){
-              undergradContainer.appendChild(card);
-            }
-          });
-        })
-        .catch(err => console.error('Error loading students:', err));
-    }
+      function initials(name) {
+        return String(name || '').trim().split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 2).toUpperCase();
+      }
 
-    // 페이지 로드 시 교수 및 학생 정보 불러오기
-    loadProfessor();
-    loadStudents();
+      function infoCard(title, value) {
+        var items = DISLAB.splitList(value, ';');
+        if (!items.length) { return ''; }
+        return '<div class="card info-card"><h3>' + title + '</h3><ul>' +
+          items.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') + '</ul></div>';
+      }
+
+      function professorHTML(p) {
+        if (!p || !p.name) { return ''; }
+        var photo = DISLAB.safeUrl(p.photo);
+        var lines = '';
+        if (p.email) { lines += '<li>' + ICON.mail + '<a href="mailto:' + esc(p.email) + '">' + esc(p.email) + '</a></li>'; }
+        if (p.phone) { lines += '<li>' + ICON.phone + '<span>' + esc(p.phone) + '</span></li>'; }
+        if (p.address) { lines += '<li>' + ICON.pin + '<span>' + esc(p.address) + '</span></li>'; }
+        return '<div class="group"><h2 class="section-title">Professor</h2>' +
+          '<div class="card prof">' +
+            (photo
+              ? '<img class="prof-photo" src="' + esc(photo) + '" alt="' + esc(p.name) + '" data-fallback="' + esc(initials(p.name)) + '">'
+              : '<div class="avatar-fallback prof-photo" aria-hidden="true">' + esc(initials(p.name)) + '</div>') +
+            '<div><h2>' + esc(p.name) + '</h2>' +
+            (p.position ? '<p class="prof-position">' + esc(p.position) + '</p>' : '') +
+            '<ul class="contact-lines">' + lines + '</ul></div>' +
+          '</div>' +
+          '<div class="info-grid">' +
+            infoCard('Education', p.education) +
+            infoCard('Research Experience', p.research_experience) +
+            infoCard('Honors and Awards', p.honors) +
+            infoCard('Academic Activities', p.academic_activities) +
+          '</div></div>';
+      }
+
+      function studentHTML(s) {
+        var photo = DISLAB.safeUrl(s.photo);
+        var github = DISLAB.safeUrl(s.github);
+        return '<li class="card person">' +
+          (photo
+            ? '<img class="person-photo" src="' + esc(photo) + '" alt="" loading="lazy" data-fallback="' + esc(initials(s.name)) + '">'
+            : '<div class="avatar-fallback person-photo" aria-hidden="true">' + esc(initials(s.name)) + '</div>') +
+          '<h3>' + esc(s.name) + '</h3>' +
+          (s.email ? '<p class="person-email">' + esc(s.email) + '</p>' : '') +
+          '<div class="person-links">' +
+            (s.email ? '<a href="mailto:' + esc(s.email) + '">' + ICON.mail + 'Email</a>' : '') +
+            (github ? '<a href="' + esc(github) + '" target="_blank" rel="noopener">' + ICON.code + 'GitHub</a>' : '') +
+          '</div></li>';
+      }
+
+      function studentsHTML(students) {
+        var groups = [], byTitle = {};
+        function group(title) {
+          if (!byTitle[title]) { byTitle[title] = { title: title, items: [] }; groups.push(byTitle[title]); }
+          return byTitle[title];
+        }
+        LEVELS.forEach(function (l) { group(l[1]); });
+        (students || []).forEach(function (s) {
+          var level = String(s.level || '').trim();
+          var known = LEVELS.filter(function (l) { return l[0].toLowerCase() === level.toLowerCase(); })[0];
+          group(known ? known[1] : (level || 'Members')).items.push(s);
+        });
+        return groups.filter(function (g) { return g.items.length; }).map(function (g) {
+          return '<div class="group"><h2 class="section-title">' + esc(g.title) +
+            ' <span class="count">' + g.items.length + '</span></h2>' +
+            '<ul class="people" style="list-style:none;margin:0;padding:0">' + g.items.map(studentHTML).join('') + '</ul></div>';
+        }).join('');
+      }
+
+      DISLAB.load({
+        target: 'membersRoot',
+        paths: ['/api/professor', '/api/students'],
+        label: 'the member list',
+        skeleton: 'cards',
+        skeletonCount: 4,
+        render: function (professor, students) {
+          var root = document.getElementById('membersRoot');
+          var html = professorHTML(professor) + studentsHTML(Array.isArray(students) ? students : []);
+          root.innerHTML = html || DISLAB.emptyHTML('No members listed yet', 'Please check back soon.');
+          DISLAB.guardImages(root);
+        }
+      });
+    })();
   </script>
 </body>
 </html>

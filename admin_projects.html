@@ -197,6 +197,7 @@
     </div>
   </div>
   
+  <script src="assets/js/config.js"></script>
   <script>
     // 관리자 토큰 확인
     const token = localStorage.getItem('adminToken');
@@ -216,10 +217,10 @@
         end_month: document.getElementById('end_month').value,
         funding: document.getElementById('funding').value
       };
-      let endpoint = 'https://www.nameyee.me/api/add_project';
+      let endpoint = window.DISLAB_API_BASE + '/api/add_project';
       if(projectId) {
         projectData.id = parseInt(projectId);
-        endpoint = 'https://www.nameyee.me/api/update_project';
+        endpoint = window.DISLAB_API_BASE + '/api/update_project';
       }
       fetch(endpoint, {
         method: 'POST',
@@ -246,7 +247,7 @@
     
     // 프로젝트 리스트 로드 함수
     function loadProjects(){
-      fetch('https://www.nameyee.me/api/projects')
+      fetch(window.DISLAB_API_BASE + '/api/projects')
       .then(response => response.json())
       .then(data => {
         const tbody = document.getElementById('projectTable').querySelector('tbody');
@@ -268,7 +269,7 @@
         document.querySelectorAll('.editBtn').forEach(button => {
           button.addEventListener('click', function(){
             const id = this.getAttribute('data-id');
-            fetch('https://www.nameyee.me/api/projects')
+            fetch(window.DISLAB_API_BASE + '/api/projects')
               .then(response => response.json())
               .then(data => {
                 const project = data.find(x => x.id == id);
@@ -299,7 +300,7 @@
         alert('삭제할 프로젝트를 선택하세요.');
         return;
       }
-      fetch('https://www.nameyee.me/api/delete_projects', {
+      fetch(window.DISLAB_API_BASE + '/api/delete_projects', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

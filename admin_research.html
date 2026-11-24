@@ -204,6 +204,7 @@
     </div>
   </div>
   
+  <script src="assets/js/config.js"></script>
   <script>
     // 관리자 토큰 확인
     const token = localStorage.getItem('adminToken');
@@ -221,10 +222,10 @@
         title: document.getElementById('title').value,
         description: document.getElementById('description').value
       };
-      let endpoint = 'https://www.nameyee.me/api/add_research';
+      let endpoint = window.DISLAB_API_BASE + '/api/add_research';
       if(researchId) {
         researchData.id = parseInt(researchId);
-        endpoint = 'https://www.nameyee.me/api/update_research';
+        endpoint = window.DISLAB_API_BASE + '/api/update_research';
       }
       fetch(endpoint, {
         method: 'POST',
@@ -251,7 +252,7 @@
     
     // 연구 항목 리스트 로드 함수
     function loadResearch(){
-      fetch('https://www.nameyee.me/api/research')
+      fetch(window.DISLAB_API_BASE + '/api/research')
       .then(response => response.json())
       .then(data => {
         const tbody = document.getElementById('researchTable').querySelector('tbody');
@@ -272,7 +273,7 @@
         document.querySelectorAll('.editBtn').forEach(button => {
           button.addEventListener('click', function(){
             const id = this.getAttribute('data-id');
-            fetch('https://www.nameyee.me/api/research')
+            fetch(window.DISLAB_API_BASE + '/api/research')
               .then(response => response.json())
               .then(data => {
                 const item = data.find(x => x.id == id);
@@ -301,7 +302,7 @@
         alert('삭제할 연구 항목을 선택하세요.');
         return;
       }
-      fetch('https://www.nameyee.me/api/delete_research', {
+      fetch(window.DISLAB_API_BASE + '/api/delete_research', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

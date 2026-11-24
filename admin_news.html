@@ -180,6 +180,7 @@
     </div>
   </div>
 
+  <script src="assets/js/config.js"></script>
   <script>
     // 관리자 토큰 확인
     const token = localStorage.getItem('adminToken');
@@ -197,7 +198,7 @@
         snippet: document.getElementById('snippet').value,
         url: document.getElementById('url').value
       };
-      fetch('https://www.nameyee.me/api/add_news', {
+      fetch(window.DISLAB_API_BASE + '/api/add_news', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -221,7 +222,7 @@
     
     // 뉴스 리스트 로드 함수
     function loadNews(){
-      fetch('https://www.nameyee.me/api/news')
+      fetch(window.DISLAB_API_BASE + '/api/news')
       .then(response => response.json())
       .then(data => {
         const tbody = document.getElementById('newsTable').querySelector('tbody');
@@ -253,7 +254,7 @@
         alert('삭제할 뉴스를 선택하세요.');
         return;
       }
-      fetch('https://www.nameyee.me/api/delete_news', {
+      fetch(window.DISLAB_API_BASE + '/api/delete_news', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

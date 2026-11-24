@@ -2,155 +2,122 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Projects - Distributed Intelligence & Systems Laboratory</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Google Fonts & Material Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@300;600;700&family=Roboto:wght@300;400;500;700&family=Material+Symbols+Outlined" rel="stylesheet">
-  <style>
-    /* 기본 리셋 및 박스 모델 */
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      min-height: 100%;
-      background-color: #ffffff;
-      color: #000000;
-      box-sizing: border-box;
-      font-family: 'Roboto', sans-serif;
-    }
-    *, *::before, *::after {
-      box-sizing: inherit;
-    }
-    .wrapper {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-    .menu {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 2rem;
-      font-family: 'Rethink Sans', sans-serif;
-      margin-bottom: 2rem;
-    }
-    .menu a {
-      text-decoration: none;
-      color: #002554;
-      font-size: clamp(14px, 2vw, 20px);
-      font-weight: 400;
-      transition: color 0.3s;
-    }
-    .menu a:hover {
-      color: #666;
-    }
-    .inner {
-      /* 필요시 margin-top 추가 */
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 2rem;
-      color: #002554;
-    }
-    .grid-container {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      align-items: stretch;
-    }
-    .project-card {
-      display: block;
-      text-decoration: none;
-      color: inherit;
-    }
-    .project-card-inner {
-      display: flex;
-      flex-direction: column;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 1rem;
-      background-color: #fafafa;
-      transition: box-shadow 0.3s;
-      height: 100%;
-    }
-    .project-card-inner:hover {
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    }
-    .project-title {
-      font-family: 'Rethink Sans', sans-serif;
-      font-size: 1.4rem;
-      font-weight: 800;
-      margin: 0.5rem 0;
-      color: #333;
-    }
-    .project-info {
-      font-size: 0.9rem;
-      color: #555;
-      margin: 0.5rem 0;
-      line-height: 1.4;
-    }
-    .project-duration {
-      margin-bottom: 0.5rem;
-    }
-    @media (max-width: 768px) {
-      .menu {
-        flex-wrap: wrap;
-        margin-bottom: 1rem;
-      }
-      .grid-container {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <title>Projects - Distributed Intelligence &amp; Systems Laboratory</title>
+  <meta name="description" content="Funded research projects of the Distributed Intelligence &amp; Systems Laboratory.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cnu-dislab.github.io/projects.html">
+  <meta property="og:title" content="Projects - Distributed Intelligence &amp; Systems Laboratory">
+  <meta property="og:description" content="Funded research projects of the Distributed Intelligence &amp; Systems Laboratory.">
+  <meta property="og:image" content="https://cnu-dislab.github.io/assets/thumb.JPG">
+  <link rel="icon" type="image/png" href="src/img/cnu_logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;family=Rethink+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body>
-  <div class="wrapper">
-    <!-- 최상단 메뉴 -->
-    <nav class="menu">
-      <a href="index.html">Home</a>
-      <a href="members.html">Members</a>
-      <a href="publications.html">Publications</a>
-      <a href="research.html">Research</a>
-      <a href="projects.html">Projects</a>
-      <a href="news.html">News</a>
-      <a href="contact.html">Contact</a>
-    </nav>
-    
-    <div class="inner">
-      <h1>Projects</h1>
-      <div class="grid-container" id="projectsContainer">
-        <!-- 프로젝트 카드들이 동적으로 삽입됩니다. -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="DIS Lab home">
+        <img src="src/img/lab_logo.png" width="1280" height="500" alt="Distributed Intelligence &amp; Systems Lab, Chungnam National University">
+      </a>
+      <button type="button" class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span></button>
+      <nav id="site-nav" class="site-nav" aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="members.html">Members</a>
+        <a href="research.html">Research</a>
+        <a href="publications.html">Publications</a>
+        <a href="projects.html" aria-current="page">Projects</a>
+        <a href="lectures.html">Lectures</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="page-head">
+      <div class="container">
+        <h1>Projects</h1>
+        <p>Funded research projects of the Distributed Intelligence &amp; Systems Laboratory.</p>
       </div>
     </div>
-  </div>
-  
+    <section class="section">
+      <div class="container" id="projectsContainer"></div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="src/img/lab_logo.png" width="1280" height="500" alt="" loading="lazy">
+        <p>Distributed Intelligence &amp; Systems Laboratory</p>
+        <p>Chungnam National University</p>
+      </div>
+      <div>
+        <h2>Prof. Heecheol Yang</h2>
+        <p>Tel. 042-821-6656</p>
+        <p><a href="mailto:hcyang@cnu.ac.kr">hcyang@cnu.ac.kr</a></p>
+        <p>Rm. 522, Engineering Unit 5 (W2)</p>
+      </div>
+      <div>
+        <h2>Laboratory</h2>
+        <p>Tel. 042-821-7290</p>
+        <p>Rm. 504, Engineering Unit 5 (W2)</p>
+        <p>99 Daehak-ro, Yuseong-gu, Daejeon, Korea [34134]</p>
+      </div>
+    </div>
+    <div class="container footer-bottom"><span>&copy; DIS Lab, Chungnam National University</span></div>
+  </footer>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/site.js"></script>
   <script>
-    function loadProjects() {
-      fetch('https://www.nameyee.me/api/projects')
-        .then(response => response.json())
-        .then(data => {
-          const container = document.getElementById('projectsContainer');
-          container.innerHTML = '';
-          data.forEach(item => {
-            const card = document.createElement('a');
-            card.href = "#";  // 필요 시 세부 페이지 링크 지정
-            card.className = 'project-card';
-            card.innerHTML = `
-              <div class="project-card-inner">
-                ${item.image ? `<img src="${item.image}" alt="${item.title}" style="width:100%; height:auto; margin-bottom:1rem;">` : ''}
-                <h3 class="project-title">${item.title}</h3>
-                <div class="project-info">
-                  <div class="project-duration"><strong>Duration:</strong> ${item.start_month} ~ ${item.end_month}</div>
-                  <div class="project-funding"><strong>Funding:</strong> ${item.funding}</div>
-                </div>
-              </div>
-            `;
-            container.appendChild(card);
-          });
-        })
-        .catch(err => console.error('Error loading projects:', err));
-    }
-    loadProjects();
+    DISLAB.load({
+      target: 'projectsContainer',
+      paths: ['/api/projects'],
+      label: 'the project list',
+      skeletonCount: 3,
+      render: function (data) {
+        var esc = DISLAB.esc;
+        var el = document.getElementById('projectsContainer');
+        var now = new Date();
+        var nowKey = now.getFullYear() * 12 + now.getMonth() + 1;
+
+        function key(d) { return d.year ? d.year * 12 + (d.month || 12) : null; }
+        function label(raw, d) {
+          if (!d.year) { return String(raw || ''); }
+          return (d.month ? DISLAB.MONTH_NAMES[d.month - 1] + ' ' : '') + d.year;
+        }
+
+        var items = (Array.isArray(data) ? data : []).map(function (p) {
+          var s = DISLAB.parseDate(p.start_month), e = DISLAB.parseDate(p.end_month);
+          var endKey = key(e);
+          return { p: p, s: s, e: e, startKey: key(s) || 0, ongoing: endKey === null ? null : endKey >= nowKey };
+        }).sort(function (a, b) { return b.startKey - a.startKey || b.p.id - a.p.id; });
+
+        if (!items.length) { el.innerHTML = DISLAB.emptyHTML('No projects listed yet', 'Please check back soon.'); return; }
+
+        function card(it) {
+          var p = it.p, img = DISLAB.safeUrl(p.image);
+          var period = [label(p.start_month, it.s), label(p.end_month, it.e)].filter(Boolean).join(' – ');
+          return '<article class="card project">' +
+            (img ? '<div class="project-img" data-img-wrap><img src="' + esc(img) + '" alt="" loading="lazy" data-fallback="remove"></div>' : '') +
+            '<h3>' + esc(p.title) + '</h3><dl>' +
+            (period ? '<dt>Period</dt><dd>' + esc(period) + '</dd>' : '') +
+            (p.funding ? '<dt>Funding</dt><dd>' + esc(p.funding) + '</dd>' : '') +
+            '</dl></article>';
+        }
+        function group(title, list) {
+          if (!list.length) { return ''; }
+          return '<div class="group"><h2 class="section-title">' + title + ' <span class="count">' + list.length + '</span></h2>' +
+            '<div class="grid-2">' + list.map(card).join('') + '</div></div>';
+        }
+        var ongoing = items.filter(function (i) { return i.ongoing === true; });
+        var done = items.filter(function (i) { return i.ongoing === false; });
+        var other = items.filter(function (i) { return i.ongoing === null; });
+        el.innerHTML = group('Ongoing Projects', ongoing) + group('Completed Projects', done) + group('Other Projects', other);
+        DISLAB.guardImages(el);
+      }
+    });
   </script>
 </body>
 </html>

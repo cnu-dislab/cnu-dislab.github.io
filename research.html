@@ -2,161 +2,101 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Research - Distributed Intelligence & Systems Laboratory</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Google Fonts & Material Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:wght@300;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <style>
-    /* 기본 리셋 및 박스 모델 */
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      min-height: 100%;
-      background-color: #ffffff;
-      color: #000000;
-      box-sizing: border-box;
-      font-family: 'Roboto', sans-serif;
-    }
-    *, *::before, *::after {
-      box-sizing: inherit;
-    }
-    /* 전체 래퍼 */
-    .wrapper {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-    /* 최상단 메뉴 */
-    .menu {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 2rem;
-      font-family: 'Rethink Sans', sans-serif;
-      margin-bottom: 2rem;
-    }
-    .menu a {
-      text-decoration: none;
-      color: #002554;
-      font-size: clamp(14px, 2vw, 20px);
-      font-weight: 400;
-      transition: color 0.3s;
-    }
-    .menu a:hover {
-      color: #666;
-    }
-    /* 내부 컨텐츠 */
-    .inner {
-      text-align: center;
-    }
-    .inner h1 {
-      margin-bottom: 2rem;
-    }
-    /* 2열 그리드 컨테이너 */
-    .grid-container {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-    }
-    /* 연구 카드 스타일 */
-    .research-card {
-      display: flex;
-      flex-direction: column;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      overflow: hidden;
-      background-color: #fafafa;
-      transition: box-shadow 0.3s;
-    }
-    .research-card:hover {
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
-    .research-card img {
-      width: 100%;
-      aspect-ratio: 2 / 1;
-      object-fit: cover;
-      display: block;
-    }
-    .research-content {
-      padding: 1rem;
-      margin-top: auto;
-    }
-    .research-title {
-      font-family: 'Rethink Sans', sans-serif;
-      font-size: 1.6rem;
-      font-weight: 700;
-      margin-bottom: 0.8rem;
-      color: #333;
-    }
-    .research-desc {
-      font-size: 1rem;
-      line-height: 1.4;
-      color: #555;
-      margin: 0;
-    }
-    .research-desc p {
-      margin: 0.4rem 0;
-    }
-    /* 반응형: 모바일에서 1열 */
-    @media (max-width: 768px) {
-      .grid-container {
-        grid-template-columns: 1fr;
-      }
-      .menu {
-        flex-wrap: wrap;
-      }
-    }
-  </style>
+  <title>Research - Distributed Intelligence &amp; Systems Laboratory</title>
+  <meta name="description" content="Research topics of the Distributed Intelligence &amp; Systems Laboratory.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cnu-dislab.github.io/research.html">
+  <meta property="og:title" content="Research - Distributed Intelligence &amp; Systems Laboratory">
+  <meta property="og:description" content="Research topics of the Distributed Intelligence &amp; Systems Laboratory.">
+  <meta property="og:image" content="https://cnu-dislab.github.io/assets/thumb.JPG">
+  <link rel="icon" type="image/png" href="src/img/cnu_logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&amp;family=Rethink+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body>
-  <div class="wrapper">
-    <!-- 최상단 메뉴 -->
-    <nav class="menu">
-      <a href="index.html">Home</a>
-      <a href="members.html">Members</a>
-      <a href="publications.html">Publications</a>
-      <a href="research.html">Research</a>
-      <a href="projects.html">Projects</a>
-      <a href="news.html">News</a>
-      <a href="contact.html">Contact</a>
-    </nav>
-    
-    <div class="inner">
-      <h1>Research</h1>
-      <div class="grid-container" id="researchContainer">
-        <!-- 연구 카드들이 동적으로 삽입됩니다. -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="DIS Lab home">
+        <img src="src/img/lab_logo.png" width="1280" height="500" alt="Distributed Intelligence &amp; Systems Lab, Chungnam National University">
+      </a>
+      <button type="button" class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span></button>
+      <nav id="site-nav" class="site-nav" aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="members.html">Members</a>
+        <a href="research.html" aria-current="page">Research</a>
+        <a href="publications.html">Publications</a>
+        <a href="projects.html">Projects</a>
+        <a href="lectures.html">Lectures</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="page-head">
+      <div class="container">
+        <h1>Research</h1>
+        <p>Research topics of the Distributed Intelligence &amp; Systems Laboratory.</p>
       </div>
     </div>
-  </div>
-
+    <section class="section">
+      <div class="container">
+        <div class="grid-2" id="researchContainer"></div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <img src="src/img/lab_logo.png" width="1280" height="500" alt="" loading="lazy">
+        <p>Distributed Intelligence &amp; Systems Laboratory</p>
+        <p>Chungnam National University</p>
+      </div>
+      <div>
+        <h2>Prof. Heecheol Yang</h2>
+        <p>Tel. 042-821-6656</p>
+        <p><a href="mailto:hcyang@cnu.ac.kr">hcyang@cnu.ac.kr</a></p>
+        <p>Rm. 522, Engineering Unit 5 (W2)</p>
+      </div>
+      <div>
+        <h2>Laboratory</h2>
+        <p>Tel. 042-821-7290</p>
+        <p>Rm. 504, Engineering Unit 5 (W2)</p>
+        <p>99 Daehak-ro, Yuseong-gu, Daejeon, Korea [34134]</p>
+      </div>
+    </div>
+    <div class="container footer-bottom"><span>&copy; DIS Lab, Chungnam National University</span></div>
+  </footer>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/site.js"></script>
   <script>
-    function loadResearch() {
-      fetch('https://www.nameyee.me/api/research')
-        .then(response => response.json())
-        .then(data => {
-          // 예시로 id 오름차순 정렬 (필요시 날짜 등 다른 기준으로 정렬 가능)
-          data.sort((a, b) => a.id - b.id);
-          const container = document.getElementById('researchContainer');
-          container.innerHTML = '';
-          data.forEach(item => {
-            // description은 줄바꿈(\n) 기준으로 <p> 태그로 변환
-            const paragraphs = item.description ? item.description.split('\n').map(p => `<p>${p.trim()}</p>`).join('') : '';
-            const card = document.createElement('div');
-            card.className = 'research-card';
-            card.innerHTML = `
-              <img src="${item.image}" alt="${item.title}">
-              <div class="research-content">
-                <h2 class="research-title">${item.title}</h2>
-                <div class="research-desc">${paragraphs}</div>
-              </div>
-            `;
-            container.appendChild(card);
-          });
-        })
-        .catch(err => console.error('Error loading research items:', err));
-    }
-    loadResearch();
+    DISLAB.load({
+      target: 'researchContainer',
+      paths: ['/api/research'],
+      label: 'the research topics',
+      skeleton: 'cards',
+      skeletonCount: 2,
+      render: function (data) {
+        var esc = DISLAB.esc;
+        var el = document.getElementById('researchContainer');
+        var items = (Array.isArray(data) ? data : []).slice().sort(function (a, b) { return a.id - b.id; });
+        if (!items.length) { el.innerHTML = DISLAB.emptyHTML('No research topics listed yet', 'Please check back soon.'); return; }
+        el.innerHTML = items.map(function (item) {
+          var img = DISLAB.safeUrl(item.image);
+          /* Lines are separated by a newline; some stored rows contain a literal "\\n" instead. */
+          var lines = DISLAB.splitList(item.description, /\r?\n|\\n/);
+          return '<article class="card research-card">' +
+            (img ? '<div class="research-img" data-img-wrap><img src="' + esc(img) + '" alt="" loading="lazy" data-fallback="remove"></div>' : '') +
+            '<div class="research-body"><h2>' + esc(item.title) + '</h2>' +
+            (lines.length ? '<ul>' + lines.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>' : '') +
+            '</div></article>';
+        }).join('');
+        DISLAB.guardImages(el);
+      }
+    });
   </script>
 </body>
 </html>
