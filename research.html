@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <!-- No inline scripts or style attributes: page scripts live in assets/js/, styles in assets/css/site.css.
+       Local dev reads the API from 127.0.0.1 / localhost (see assets/js/config.js). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https: data:; connect-src https://api.dnclab.dev http://127.0.0.1:* http://localhost:*; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Research - Distributed Intelligence &amp; Systems Laboratory</title>
   <meta name="description" content="Research topics of the Distributed Intelligence &amp; Systems Laboratory.">
   <meta property="og:type" content="website">
@@ -72,31 +76,6 @@
   </footer>
   <script src="assets/js/config.js"></script>
   <script src="assets/js/site.js"></script>
-  <script>
-    DISLAB.load({
-      target: 'researchContainer',
-      paths: ['/api/research'],
-      label: 'the research topics',
-      skeleton: 'cards',
-      skeletonCount: 2,
-      render: function (data) {
-        var esc = DISLAB.esc;
-        var el = document.getElementById('researchContainer');
-        var items = (Array.isArray(data) ? data : []).slice().sort(function (a, b) { return a.id - b.id; });
-        if (!items.length) { el.innerHTML = DISLAB.emptyHTML('No research topics listed yet', 'Please check back soon.'); return; }
-        el.innerHTML = items.map(function (item) {
-          var img = DISLAB.safeUrl(item.image);
-          /* Lines are separated by a newline; some stored rows contain a literal "\\n" instead. */
-          var lines = DISLAB.splitList(item.description, /\r?\n|\\n/);
-          return '<article class="card research-card">' +
-            (img ? '<div class="research-img" data-img-wrap><img src="' + esc(img) + '" alt="" loading="lazy" data-fallback="remove"></div>' : '') +
-            '<div class="research-body"><h2>' + esc(item.title) + '</h2>' +
-            (lines.length ? '<ul>' + lines.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>' : '') +
-            '</div></article>';
-        }).join('');
-        DISLAB.guardImages(el);
-      }
-    });
-  </script>
+  <script src="assets/js/research.js"></script>
 </body>
 </html>

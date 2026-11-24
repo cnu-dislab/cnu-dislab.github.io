@@ -20,11 +20,22 @@
       .replace(/'/g, '&#39;');
   }
 
-  /* Only http(s) and site-relative links are allowed through; "#" and blanks become ''. */
+  /*
+   * Only http(s) and site-relative links are allowed through; "#" and blanks become ''.
+   * Browsers strip control characters, tabs and newlines from URLs and read "\" as "/",
+   * so "\x01javascript:..." or "java\nscript:..." would run script and "/\evil.com" would
+   * leave the site: after trimming, anything with control characters, DEL, a backslash or
+   * whitespace is rejected outright. The one exception is a plain space inside an http(s)
+   * URL (stored Google Scholar search links contain them): the scheme is already fixed
+   * there and the browser just percent-encodes the space.
+   */
+  var UNSAFE_URL_CHARS = /[\u0000-\u001f\u007f-\u009f\\]|[^\S ]/;
   function safeUrl(url) {
     var u = String(url == null ? '' : url).trim();
     if (!u || u === '#') { return ''; }
+    if (UNSAFE_URL_CHARS.test(u)) { return ''; }
     if (/^https?:\/\//i.test(u)) { return u; }
+    if (u.indexOf(' ') !== -1) { return ''; }
     if (/^[a-z][a-z0-9+.\-]*:/i.test(u) || u.indexOf('//') === 0) { return ''; }
     return u;
   }

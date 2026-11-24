@@ -8,9 +8,23 @@
  *   - URLs from the API go through DISLAB.safeUrl before reaching href / src.
  *   - The admin pages ship a CSP that forbids inline scripts; keep all JS in files.
  *   - The token and password are never put in URLs or logged.
+ *   - Clickjacking: admin.css hides the page until this file adds .unframed to <html>,
+ *     which it only does when the page is the top-level window (see below).
  */
 (function () {
   'use strict';
+
+  /* Reveal the page only when it is not inside a frame. This runs first so the page shows as
+     soon as possible; comparing window.top is allowed even when the parent is cross-origin. */
+  var framed = true;
+  try { framed = window.top !== window.self; } catch (e) { framed = true; }
+  if (!framed) {
+    document.documentElement.classList.add('unframed');
+    /* The browser may already have skipped `autofocus` (e.g. the login username field)
+       while the page was hidden; apply it now unless something else has focus. */
+    var auto = document.querySelector('[autofocus]');
+    if (auto && (!document.activeElement || document.activeElement === document.body)) { auto.focus(); }
+  }
 
   var API = window.DISLAB_API_BASE;
   var safeUrl = window.DISLAB.safeUrl;

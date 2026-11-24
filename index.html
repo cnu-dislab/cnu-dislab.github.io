@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <!-- No inline scripts or style attributes: page scripts live in assets/js/, styles in assets/css/site.css.
+       Local dev reads the API from 127.0.0.1 / localhost (see assets/js/config.js). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https: data:; connect-src https://api.dnclab.dev http://127.0.0.1:* http://localhost:*; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Distributed Intelligence &amp; Systems Laboratory</title>
   <meta name="description" content="Distributed Intelligence &amp; Systems Laboratory at Chungnam National University: research in distributed learning, trustworthy AI and AI-native 6G.">
   <meta property="og:type" content="website">
@@ -113,53 +117,6 @@
   </footer>
   <script src="assets/js/config.js"></script>
   <script src="assets/js/site.js"></script>
-  <script>
-    DISLAB.load({
-      target: 'homeNews',
-      paths: ['/api/news'],
-      label: 'the latest news',
-      skeletonCount: 2,
-      render: function (news) {
-        var el = document.getElementById('homeNews');
-        var items = DISLAB.sortNews(news).slice(0, 3);
-        el.innerHTML = items.length
-          ? '<ul class="news-list">' + items.map(DISLAB.newsItemHTML).join('') + '</ul>'
-          : DISLAB.emptyHTML('No news yet', 'Announcements will appear here.');
-      }
-    });
-
-    /* Animated network background: purely decorative, loaded after the content
-       and skipped when the visitor prefers reduced motion or WebGL is missing. */
-    (function () {
-      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduce) { return; }
-      function add(src, next) {
-        var s = document.createElement('script');
-        s.src = src; s.onload = next;
-        document.body.appendChild(s);
-      }
-      window.addEventListener('load', function () {
-        add('three.min.js', function () {
-          add('dist/vanta.net.min.js', function () {
-            try {
-              VANTA.NET({
-                el: '#hero-bg',
-                mouseControls: true,
-                touchControls: true,
-                gyroControls: false,
-                minHeight: 200.0,
-                minWidth: 200.0,
-                scale: 1.0,
-                scaleMobile: 1.0,
-                color: 0xffffff,
-                backgroundColor: 0x002554,
-                points: 20
-              });
-            } catch (e) { /* the plain navy hero remains */ }
-          });
-        });
-      });
-    })();
-  </script>
+  <script src="assets/js/home.js"></script>
 </body>
 </html>

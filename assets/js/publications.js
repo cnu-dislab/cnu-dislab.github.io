@@ -199,7 +199,7 @@
 
     if (!shown.length) {
       els.jump.innerHTML = '';
-      els.list.innerHTML = '<div style="margin-top:20px">' + D.emptyHTML(
+      els.list.innerHTML = '<div class="pub-empty">' + D.emptyHTML(
         papers.length ? 'No publications match your search' : 'No publications listed yet',
         papers.length ? 'Try a different keyword or another category.' : 'Please check back soon.'
       ) + '</div>';

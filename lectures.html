@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <!-- No inline scripts or style attributes: page scripts live in assets/js/, styles in assets/css/site.css.
+       Local dev reads the API from 127.0.0.1 / localhost (see assets/js/config.js). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https: data:; connect-src https://api.dnclab.dev http://127.0.0.1:* http://localhost:*; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Lectures - Distributed Intelligence &amp; Systems Laboratory</title>
   <meta name="description" content="Courses taught by Prof. Heecheol Yang.">
   <meta property="og:type" content="website">

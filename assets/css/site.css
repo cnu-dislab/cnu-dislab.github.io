@@ -293,7 +293,7 @@ p { margin: 0 0 1em; }
 .info-card ul { margin: 0; padding-left: 18px; color: var(--ink-soft); font-size: 15px; }
 .info-card li { margin: 5px 0; }
 
-.people { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+.people { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
 .person { padding: 18px; text-align: center; }
 .person-photo, .avatar-fallback.person-photo {
   width: 140px; height: auto; aspect-ratio: 7 / 9; border-radius: 12px; object-fit: cover; object-position: top;
@@ -367,6 +367,7 @@ p { margin: 0 0 1em; }
 .contact-card { padding: 22px; }
 .contact-card h3 { font-size: 18px; margin-bottom: 12px; }
 .contact-card .contact-lines { margin-bottom: 0; }
+.contact-note { margin-top: 16px; color: var(--ink-faint); font-size: 14.5px; }
 @media (max-width: 480px) {
   .steps li { padding: 66px 18px 18px; }
   .steps li::before { left: 18px; top: 16px; }
@@ -406,6 +407,7 @@ p { margin: 0 0 1em; }
 }
 .year-heading .count { font-size: 14px; font-weight: 600; color: var(--ink-faint); }
 .pub-list { list-style: none; margin: 0; padding: 0; }
+.pub-empty { margin-top: 20px; }
 .pub { padding: 18px 0; border-bottom: 1px solid var(--line); }
 .pub-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px; color: var(--ink-faint); font-weight: 600; }
 .pub-title { font-size: 18px; font-weight: 700; color: var(--ink); line-height: 1.35; }

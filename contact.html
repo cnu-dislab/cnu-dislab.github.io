@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <!-- No inline scripts or style attributes: page scripts live in assets/js/, styles in assets/css/site.css.
+       Local dev reads the API from 127.0.0.1 / localhost (see assets/js/config.js). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https: data:; connect-src https://api.dnclab.dev http://127.0.0.1:* http://localhost:*; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Contact - Distributed Intelligence &amp; Systems Laboratory</title>
   <meta name="description" content="분산 지능 및 시스템 연구실 (DIS Lab) 문의 및 대학원 진학 안내.">
   <meta property="og:type" content="website">
@@ -86,7 +90,7 @@
             </ul>
           </div>
         </div>
-        <p style="margin-top:16px;color:var(--ink-faint);font-size:14.5px">충남대학교 컴퓨터공학과 분산 지능 및 시스템 연구실</p>
+        <p class="contact-note">충남대학교 컴퓨터공학과 분산 지능 및 시스템 연구실</p>
       </div>
     </section>
   </main>

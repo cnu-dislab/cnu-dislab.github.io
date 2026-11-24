@@ -1,5 +1,14 @@
 /* Admin area styles. Loaded after site.css and built on its tokens, cards and buttons. */
 
+/*
+ * Clickjacking guard. GitHub Pages cannot send X-Frame-Options and a meta CSP cannot set
+ * frame-ancestors, so admin pages stay hidden until admin.js confirms they are the top-level
+ * window and adds .unframed to <html>. Inside any frame (including sandboxed frames that block
+ * scripts or top navigation) nothing is rendered, so nothing can be clicked or focused.
+ * Without JavaScript the admin pages stay blank, which is fine: they need JavaScript anyway.
+ */
+html:not(.unframed) { display: none !important; }
+
 body.admin { background: var(--surface-alt); }
 
 /* ---------- header ---------- */
