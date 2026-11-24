@@ -136,7 +136,8 @@
           (s.email ? '<p class="person-email">' + esc(s.email) + '</p>' : '') +
           '<div class="person-links">' +
             (s.email ? '<a href="mailto:' + esc(s.email) + '">' + ICON.mail + 'Email</a>' : '') +
-            (github ? '<a href="' + esc(github) + '" target="_blank" rel="noopener">' + ICON.code + 'GitHub</a>' : '') +
+            (github ? '<a href="' + esc(github) + '" target="_blank" rel="noopener">' + ICON.code + 'GitHub</a>'
+                    : '<span class="is-disabled" aria-disabled="true" title="No GitHub profile">' + ICON.code + 'GitHub</span>') +
           '</div></li>';
       }
 

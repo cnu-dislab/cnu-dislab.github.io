@@ -303,10 +303,11 @@ p { margin: 0 0 1em; }
 .avatar-fallback.prof-photo { font-size: 56px; }
 .person h3 { font-size: 17px; color: var(--ink); }
 .person-links { display: flex; justify-content: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-.person-links a {
+.person-links a, .person-links span {
   display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600;
   color: var(--navy); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px;
 }
+.person-links span.is-disabled { color: var(--ink-faint); opacity: .55; cursor: default; }
 .person-links a:hover { background: var(--accent-soft); border-color: var(--accent); text-decoration: none; }
 .person-links svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .person-email { font-size: 13.5px; color: var(--ink-faint); margin: 2px 0 0; overflow-wrap: anywhere; word-break: normal; }
