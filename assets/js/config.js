@@ -2,7 +2,7 @@
  * Single source of truth for the lab API location.
  * Every page (public and admin) loads this file and reads window.DISLAB_API_BASE.
  *
- * Production value: https://www.nameyee.me
+ * Production value: https://api.dnclab.dev
  *
  * Local development only: when the page itself is served from localhost/127.0.0.1,
  * the API defaults to http://127.0.0.1:8080. From a local page you can also pass
@@ -11,7 +11,7 @@
  * (remembered for the browser tab). Overrides are ignored on the deployed site.
  */
 (function () {
-  var PRODUCTION = 'https://www.nameyee.me';
+  var PRODUCTION = 'https://api.dnclab.dev';
   var LOCAL_DEFAULT = 'http://127.0.0.1:8080';
   var LOCAL_HOST = /^(localhost|127\.0\.0\.1)$/;
   var LOCAL_URL = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d{1,5})?$/;

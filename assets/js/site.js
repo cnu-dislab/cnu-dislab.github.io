@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  var API_BASE = window.DISLAB_API_BASE || 'https://www.nameyee.me';
+  var API_BASE = window.DISLAB_API_BASE || 'https://api.dnclab.dev';
   var TIMEOUT_MS = 12000;
 
   /* ---------- helpers ---------- */
