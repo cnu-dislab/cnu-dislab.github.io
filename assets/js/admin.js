@@ -29,6 +29,7 @@
   var API = window.DISLAB_API_BASE;
   var safeUrl = window.DISLAB.safeUrl;
 
+  var CLIENT_KEY = 'dislabClientId';         /* localStorage: random id of this browser, sent at sign-in */
   var TOKEN_KEY = 'adminToken';              /* localStorage (same key the old pages used) */
   var NOTICE_KEY = 'dislabAdminNotice';      /* sessionStorage: message for the login page */
   var RETURN_KEY = 'dislabAdminReturn';      /* sessionStorage: page to return to after login */
@@ -863,11 +864,34 @@
     'loggedout': ['ok', 'You have been signed out.']
   };
 
+  /* Lockouts run from 30 s to 24 h: whole hours for long waits, exact below an hour. */
   function waitText(seconds) {
+    if (seconds >= 2 * 3600) { return 'about ' + Math.round(seconds / 3600) + ' hours'; }
+    if (seconds >= 3600) {
+      var extra = Math.floor((seconds - 3600) / 60);
+      return 'about 1 hour' + (extra >= 5 ? ' ' + extra + ' min' : '');
+    }
     var m = Math.floor(seconds / 60), s = seconds % 60;
     if (m && s) { return m + ' min ' + s + ' s'; }
     if (m) { return m + ' min'; }
     return s + ' s';
+  }
+
+  /*
+   * A random id for this browser, sent with the sign-in request so the server can hold a browser
+   * that keeps entering wrong passwords. Made once, kept across logouts; not a secret and not
+   * tied to the account. Returns '' (the field is then left out) when storage is unavailable.
+   */
+  function clientId() {
+    var id = sGet('localStorage', CLIENT_KEY);
+    if (id && /^[0-9a-f]{32}$/.test(id)) { return id; }
+    try {
+      var bytes = new Uint8Array(16);
+      window.crypto.getRandomValues(bytes);
+      id = Array.prototype.map.call(bytes, function (b) { return (b < 16 ? '0' : '') + b.toString(16); }).join('');
+    } catch (e) { return ''; }
+    sSet('localStorage', CLIENT_KEY, id);
+    return sGet('localStorage', CLIENT_KEY) === id ? id : '';
   }
 
   function login() {
@@ -878,6 +902,7 @@
     var message = document.getElementById('loginMessage');
     var lockTimer = null;
     var busy = false;
+    var attempts = [];       /* this page's recent sign-in attempts: { at, answered } */
 
     function show(kind, text) {
       message.className = 'form-alert form-alert--' + kind;
@@ -903,7 +928,11 @@
           return;
         }
         button.disabled = true;
-        show('error', 'Too many failed sign-in attempts. Please wait ' + waitText(left) + ' before trying again.');
+        /* Waits over an hour are the per-browser penalty for repeated wrong passwords. */
+        var text = seconds > 3600
+          ? 'Too many wrong passwords were entered from this browser, so sign-in is paused here. Try again in ' + waitText(left) + '.'
+          : 'Too many failed sign-in attempts. Please wait ' + waitText(left) + ' before trying again.';
+        if (message.textContent !== text || message.hidden) { show('error', text); }
       }
       tick();
       lockTimer = setInterval(tick, 1000);
@@ -929,7 +958,15 @@
       button.textContent = 'Signing in…';
       show('info', '');
 
-      request('POST', '/api/login', { username: user.value, password: pass.value }).then(function (r) {
+      var attempt = { at: Date.now(), answered: false };
+      attempts = attempts.filter(function (a) { return attempt.at - a.at < 60000; });
+      attempts.push(attempt);
+      var body = { username: user.value, password: pass.value };
+      var id = clientId();
+      if (id) { body.client_id = id; }
+
+      request('POST', '/api/login', body).then(function (r) {
+        attempt.answered = true;
         busy = false;
         button.textContent = 'Sign in';
         button.disabled = false;
@@ -957,7 +994,11 @@
         busy = false;
         button.textContent = 'Sign in';
         button.disabled = false;
-        show('error', err.message);
+        /* The web server's rate limit answers without CORS headers, which the browser reports as
+           a failed request. Only read it that way after a burst of attempts from this page, at
+           least one of which the server did answer — otherwise it is an ordinary network error. */
+        var burst = attempts.length >= 5 && attempts.some(function (a) { return a.answered; });
+        show('error', burst && !err.timeout ? 'Too many attempts — wait a minute and try again.' : err.message);
       });
     });
   }

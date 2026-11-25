@@ -140,6 +140,7 @@ html.assistant-open body.has-assistant .toast-region { bottom: 16px; right: calc
 }
 .asst-card--add { border-left-color: #2f9461; }
 .asst-card--delete { border-left-color: #b3261e; background: #fffafa; border-color: #f0c4c0; border-left-color: #b3261e; }
+.asst-card--backup { border-left-color: var(--navy); }
 .asst-card.has-error { box-shadow: 0 0 0 3px rgba(179, 38, 30, .16); }
 .asst-card.is-applied { background: #f6fbf8; border-color: #b4dcc4; border-left-color: #2f9461; }
 .asst-card.is-discarded { background: transparent; border-style: dashed; border-left-width: 1px; border-left-color: var(--line); box-shadow: none; }
@@ -152,6 +153,9 @@ html.assistant-open body.has-assistant .toast-region { bottom: 16px; right: calc
 }
 .asst-tag--add { background: #e3f4ea; color: #17643a; }
 .asst-tag--delete { background: #b3261e; color: #fff; }
+.asst-tag--backup { background: var(--navy); color: #fff; }
+.asst-tag--kind { background: #eef1f6; color: var(--ink-soft); text-transform: none; letter-spacing: 0; font-size: 12.5px; font-weight: 600; }
+.asst-file-name { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .93em; color: var(--ink-soft); }
 .asst-card-entity { font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
 .asst-status { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--ink-faint); }
 .asst-status--ok { color: #17643a; }
@@ -183,9 +187,42 @@ html.assistant-open body.has-assistant .toast-region { bottom: 16px; right: calc
 }
 .asst-note--ok { background: #e3f4ea; border-color: #b4dcc4; color: #17643a; }
 .asst-note--error { background: #fdf0ef; border-color: #f0c4c0; color: #8f1d17; }
+.asst-note--info { background: var(--accent-soft); border-color: #c6d8f7; color: #154aa6; }
 .asst-note-actions { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .asst-note-link { font-weight: 700; color: inherit; text-decoration: underline; text-underline-offset: 2px; white-space: nowrap; }
 .asst-skipped { margin: 0; font-size: 13.5px; color: var(--ink-faint); }
+
+/* ---------- backups view ---------- */
+
+.asst-backups {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  padding: 12px 14px 16px; display: flex; flex-direction: column; gap: 10px;
+}
+.asst-backups:focus { outline: none; }
+.asst-backups > * { flex: none; }
+.asst-backups-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.asst-back {
+  display: inline-flex; align-items: center; gap: 2px; min-height: 32px; padding: 4px 10px 4px 4px; margin-left: -4px;
+  font: inherit; font-size: 14.5px; font-weight: 600; color: var(--accent);
+  background: transparent; border: 0; border-radius: 8px; cursor: pointer;
+}
+.asst-back:hover { background: var(--accent-soft); }
+.asst-back .asst-icon { width: 18px; height: 18px; stroke-width: 2.2; }
+.asst-backups-intro { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+.asst-backups-loading { display: flex; align-items: center; justify-content: center; gap: 10px; margin: auto 0; padding: 24px 0; color: var(--ink-soft); font-size: 14.5px; }
+
+.asst-backup-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.asst-backup {
+  display: flex; align-items: center; gap: 12px; padding: 11px 12px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 1px 2px rgba(0, 37, 84, .05);
+}
+.asst-backup-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.asst-backup-when { margin: 0; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.asst-backup-kind { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 4px 0 0; }
+.asst-backup-size { font-size: 12.5px; color: var(--ink-faint); }
+.asst-backup-counts { margin: 5px 0 0; font-size: 13.5px; color: var(--ink-soft); }
+.asst-backup-counts.is-unknown { color: var(--ink-faint); font-style: italic; }
+.asst-backup .btn { flex: none; }
 
 /* ---------- empty state ---------- */
 
@@ -278,6 +315,8 @@ html.assistant-open body.has-assistant .toast-region { bottom: 16px; right: calc
   .asst-head { padding: 10px 8px 10px 16px; }
   .asst-head-btn { width: 44px; height: 44px; }
   .asst-tool, .asst-send { width: 44px; height: 44px; }
+  .asst-back { min-height: 40px; }
+  .asst-backups { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
   .asst-hint { display: none; }
   .asst-foot { min-height: 0; }
   .asst-composer { padding-bottom: max(8px, env(safe-area-inset-bottom)); }

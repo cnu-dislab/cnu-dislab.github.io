@@ -10,6 +10,9 @@
  * API (Bearer auth through DISADMIN.request):
  *   POST /api/assistant        { messages: [{ role, text }], attachments: [{ name, media_type, data }] }
  *   POST /api/assistant/apply  { proposals: [{ id, entity, action, target_id, fields }] }
+ *   GET  /api/backups          -> { backups: [{ name, kind, created, size, counts }] }
+ *   POST /api/backups          -> { backup }                       (Backups view: "Back up now")
+ *   POST /api/backups/restore  { name } -> { restored, pre_restore_backup, counts }
  *
  * Security notes (same rules as admin.js):
  *   - Replies, summaries and field values are model output and may quote fetched web pages.
@@ -39,6 +42,7 @@
 
   var ASK_TIMEOUT_MS = 5 * 60 * 1000;   /* the call can take a couple of minutes */
   var APPLY_TIMEOUT_MS = 60 * 1000;
+  var BACKUP_TIMEOUT_MS = 60 * 1000;
   var STORE_KEY = 'dislabAssistant';    /* sessionStorage */
   var NO_TEXT = 'Please look at the attached file(s).';
 
@@ -59,6 +63,14 @@
     projects: { label: 'Project', page: 'projects', href: 'admin_projects.html', pageLabel: 'Projects', key: 'project' }
   };
   var ACTIONS = { add: 'Add', update: 'Update', 'delete': 'Delete' };
+  /* A proposal can also be "make a backup": no row, no fields, applied through the same endpoint. */
+  var BACKUP = 'backup';
+  function isBackup(p) { return p.entity === BACKUP; }
+
+  /* Backups view */
+  var BACKUP_KINDS = { manual: 'Manual', assistant: 'Before an assistant change', daily: 'Daily', 'pre-restore': 'Before a restore' };
+  var COUNT_WORDS = [['papers', 'paper', 'papers'], ['news', 'news', 'news'], ['student', 'member', 'members'], ['research', 'research topic', 'research topics'], ['projects', 'project', 'projects']];
+  var DELETE_LIMIT_HINT = 'Bulk deletion isn’t available through the assistant.';
   var FIELD_LABELS = {
     title: 'Title', authors: 'Authors', category: 'Category', date: 'Date', event: 'Venue', publication: 'Publication details',
     url: 'Link', tags: 'Tags', name: 'Name', level: 'Level', email: 'Email', github: 'GitHub', photo: 'Photo',
@@ -72,7 +84,8 @@
     { label: 'Add a paper from its link', text: 'Add this paper to Publications: ' },
     { label: 'Add papers from a PDF or screenshot', text: 'Add the publications listed in the attached file.', attach: true },
     { label: 'Fix a member’s email', text: 'Change the email of (name) to ' },
-    { label: 'Post a news item', text: 'Post a news item: ' }
+    { label: 'Post a news item', text: 'Post a news item: ' },
+    { label: 'Make a backup', text: 'Make a backup of the site data now.' }
   ];
 
   /* ---------- state ---------- */
@@ -90,6 +103,8 @@
   var unread = false;
   var started = false;
   var ui = {};
+  var view = 'chat';           /* 'chat' | 'backups' — memory only; the panel always reopens on the chat */
+  var bk = { status: 'idle', list: [], error: '', creating: false, restoring: '', note: null, stale: false };
 
   /* ---------- small helpers ---------- */
 
@@ -116,6 +131,8 @@
     x: ['M6 6l12 12', 'M18 6L6 18'],
     file: ['M7 3.5h7l4 4v13H7z', 'M14 3.5v4h4'],
     check: ['M5 12.5l4.500 4.500L19 7.500'],
+    back: ['M15 6l-6 6 6 6'],
+    backup: ['M4 6.5c0-1.700 3.600-3 8-3s8 1.300 8 3-3.600 3-8 3-8-1.300-8-3z', 'M4 6.5v5.500c0 1.700 3.600 3 8 3s8-1.300 8-3V6.500', 'M4 12v5.500c0 1.700 3.600 3 8 3s8-1.300 8-3V12'],
     info: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M12 11v5.500', 'M12 7.800v.2'],
     warn: ['M12 3.500L2.500 20h19z', 'M12 10v4.500', 'M12 17.200v.2']
   };
@@ -217,7 +234,9 @@
     var out = [];
     list.forEach(function (p) {
       if (!p || typeof p !== 'object') { return; }
-      if (!Object.prototype.hasOwnProperty.call(ENTITIES, p.entity) || !Object.prototype.hasOwnProperty.call(ACTIONS, p.action)) { return; }
+      var known = p.entity === BACKUP ? p.action === 'create'
+        : Object.prototype.hasOwnProperty.call(ENTITIES, p.entity) && Object.prototype.hasOwnProperty.call(ACTIONS, p.action);
+      if (!known) { return; }
       if (p.id == null || p.id === '') { return; }
       var status = fromStore && (p.status === 'applied' || p.status === 'discarded') ? p.status : 'pending';
       out.push({
@@ -228,6 +247,7 @@
         before: p.before && typeof p.before === 'object' && !Array.isArray(p.before) ? p.before : null,
         status: status,
         rowId: fromStore && p.rowId != null ? p.rowId : null,
+        backup: fromStore && typeof p.backup === 'string' ? p.backup : '',
         error: null
       });
     });
@@ -680,7 +700,7 @@
       list.forEach(function (p) { p.status = 'applying'; p.error = null; });
       render(false);
 
-      function fail(text, namedIn) {
+      function fail(text, namedIn, kind) {
         applying = false;
         list.forEach(function (p) {
           if (p.status !== 'applying') { return; }
@@ -688,7 +708,7 @@
           /* the server names the failing proposal id in its message */
           if (namedIn && new RegExp('(^|[^A-Za-z0-9_])' + String(p.id).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^A-Za-z0-9_]|$)').test(namedIn)) { p.error = true; }
         });
-        msg.note = { kind: 'error', text: text };
+        msg.note = { kind: kind || 'error', text: text };
         save();
         render(false);
         announce(text);
@@ -700,7 +720,11 @@
         if (r.status === 401) { list.forEach(function (p) { p.status = 'pending'; }); save(); A.sessionExpired(null); return; }
         var message = r.data && typeof r.data.message === 'string' ? r.data.message : '';
         if (!r.ok) {
-          if (r.status === 400) { fail('Nothing was applied. ' + (message || 'The server rejected one of the changes.'), message); }
+          if (r.status === 400 && r.data && r.data.error === 'delete_limit') {
+            /* A safety limit, not a fault: say so calmly and leave every card as it was. */
+            fail((message || 'That is more deletions than the assistant may make at once.') + ' Nothing was applied. ' + DELETE_LIMIT_HINT, '', 'info');
+          }
+          else if (r.status === 400) { fail('Nothing was applied. ' + (message || 'The server rejected one of the changes.'), message); }
           else if (r.status === 429) { fail(message || 'Too many requests. Nothing was applied; please wait a moment and try again.'); }
           else { fail((message ? message + ' ' : 'The server had a problem (HTTP ' + r.status + '). ') + 'Nothing was applied; please try again.'); }
           return;
@@ -711,7 +735,12 @@
         var failed = [];
         list.forEach(function (p) {
           var res = results.filter(function (x) { return x && String(x.id) === String(p.id); })[0];
-          if (res && res.ok) { p.status = 'applied'; p.rowId = res.row_id == null ? null : res.row_id; done.push(p); }
+          if (res && res.ok) {
+            p.status = 'applied';
+            p.rowId = res.row_id == null ? null : res.row_id;
+            p.backup = typeof res.backup === 'string' ? res.backup : '';
+            done.push(p);
+          }
           else { p.status = 'pending'; p.error = true; failed.push(String((res && (res.message || res.error)) || 'not confirmed by the server')); }
         });
         applying = false;
@@ -733,9 +762,12 @@
     var needsReload = false;
     var elsewhere = [];
     var seen = {};
+    var backups = done.filter(isBackup);
+    var changes = done.length - backups.length;
+    if (done.length) { bk.stale = true; }   /* the server may have saved a backup: the Backups view re-reads its list when next shown */
     done.forEach(function (p) {
       var info = ENTITIES[p.entity];
-      if (seen[p.entity]) { return; }
+      if (!info || seen[p.entity]) { return; }
       seen[p.entity] = true;
       if (info.page === page) {
         var ok = false;
@@ -745,11 +777,12 @@
         elsewhere.push({ href: info.href, label: info.pageLabel });
       }
     });
-    var text = done.length ? 'Applied ' + plural(done.length, 'change') + '.' : '';
+    var text = changes ? 'Applied ' + plural(changes, 'change') + '.' : '';
+    if (backups.length) { text += (text ? ' ' : '') + (backups.length === 1 ? 'Backup created.' : backups.length + ' backups created.'); }
     if (refreshed) { text += ' The list on this page was refreshed.'; }
     if (needsReload) { text += ' Reload the page to see it here (unsaved form input will be lost).'; }
     if (failedMessages.length) { text += (text ? ' ' : '') + plural(failedMessages.length, 'change') + ' failed: ' + failedMessages.join('; ') + '.'; }
-    return { kind: failedMessages.length ? 'error' : 'ok', text: text.trim(), reload: needsReload, links: elsewhere };
+    return { kind: failedMessages.length ? 'error' : 'ok', text: text.trim(), reload: needsReload, links: elsewhere, backups: backups.length > 0 };
   }
 
   function describe(p) {
@@ -809,14 +842,15 @@
   }
 
   function proposalCard(msg, p) {
+    var backup = isBackup(p);
     var info = ENTITIES[p.entity];
     var key = 'p' + msg.id + ':' + p.id;
     var settled = p.status === 'applied' || p.status === 'discarded';
-    var rows = fieldRows(p);
+    var rows = backup ? [] : fieldRows(p);
     var head = el('div', { class: 'asst-card-head' }, [
-      el('span', { class: 'asst-tag asst-tag--' + p.action, text: ACTIONS[p.action] }),
-      el('span', { class: 'asst-card-entity', text: info.label + (p.target_id != null ? ' #' + p.target_id : '') }),
-      p.status === 'applied' ? el('span', { class: 'asst-status asst-status--ok' }, [svgIcon(ICON.check), p.action === 'delete' ? 'Deleted' : 'Applied']) : null,
+      el('span', { class: 'asst-tag asst-tag--' + (backup ? 'backup' : p.action), text: backup ? 'Create backup' : ACTIONS[p.action] }),
+      backup ? null : el('span', { class: 'asst-card-entity', text: info.label + (p.target_id != null ? ' #' + p.target_id : '') }),
+      p.status === 'applied' ? el('span', { class: 'asst-status asst-status--ok' }, [svgIcon(ICON.check), backup ? 'Created' : p.action === 'delete' ? 'Deleted' : 'Applied']) : null,
       p.status === 'discarded' ? el('span', { class: 'asst-status', text: 'Discarded' }) : null
     ]);
 
@@ -828,12 +862,12 @@
     var actions = null;
     if (!settled) {
       var working = p.status === 'applying';
-      var applyLabel = p.action === 'delete' ? 'Delete' : 'Apply';
+      var applyLabel = backup ? 'Create backup' : p.action === 'delete' ? 'Delete' : 'Apply';
       actions = el('div', { class: 'asst-card-actions' }, [
         el('button', {
           type: 'button', class: 'btn btn--small ' + (p.action === 'delete' ? 'btn--danger' : 'btn--solid'), 'data-key': key + ':apply',
-          text: working ? (p.action === 'delete' ? 'Deleting…' : 'Applying…') : applyLabel, disabled: applying,
-          'aria-label': applyLabel + ': ' + (p.summary || describe(p)),
+          text: working ? (backup ? 'Creating…' : p.action === 'delete' ? 'Deleting…' : 'Applying…') : applyLabel, disabled: applying,
+          'aria-label': backup ? (p.summary ? applyLabel + ': ' + p.summary : null) : applyLabel + ': ' + (p.summary || describe(p)),
           on: { click: function () { applyProposals(msg, [p]); } }
         }),
         el('button', {
@@ -845,12 +879,13 @@
     }
 
     return el('li', {
-      class: 'asst-card asst-card--' + p.action + (settled ? ' is-' + p.status : '') + (p.error ? ' has-error' : '')
+      class: 'asst-card asst-card--' + (backup ? 'backup' : p.action) + (settled ? ' is-' + p.status : '') + (p.error ? ' has-error' : '')
     }, [
       head,
       p.summary ? el('p', { class: 'asst-card-summary', text: p.summary }) : null,
       settled && p.status === 'discarded' ? null : body,
       p.status === 'applied' && p.rowId != null && p.action === 'add' ? el('p', { class: 'asst-card-meta', text: 'Saved as #' + p.rowId }) : null,
+      p.status === 'applied' && backup && p.backup ? el('p', { class: 'asst-card-meta' }, ['Saved as ', el('span', { class: 'asst-file-name', text: p.backup })]) : null,
       actions
     ]);
   }
@@ -865,7 +900,11 @@
     if (n.reload) {
       extras.push(el('button', { type: 'button', class: 'btn btn--small btn--outline', text: 'Reload page', 'data-key': 'n' + msg.id + ':reload', on: { click: function () { window.location.reload(); } } }));
     }
-    return el('div', { class: 'asst-note asst-note--' + (n.kind === 'error' ? 'error' : 'ok'), role: n.kind === 'error' ? 'alert' : null }, [
+    if (n.backups) {
+      extras.push(el('button', { type: 'button', class: 'btn btn--small btn--outline', text: 'View backups', 'data-key': 'n' + msg.id + ':backups', on: { click: function () { setView('backups', true); } } }));
+    }
+    var kind = n.kind === 'error' || n.kind === 'info' ? n.kind : 'ok';
+    return el('div', { class: 'asst-note asst-note--' + kind, role: kind === 'error' ? 'alert' : null }, [
       el('span', { text: n.text }),
       extras.length ? el('span', { class: 'asst-note-actions' }, extras) : null
     ]);
@@ -1010,6 +1049,270 @@
     ui.launcher.title = label;
   }
 
+  /* ---------- backups view ---------- */
+
+  function backupDate(b) {
+    var d = new Date(b.created);
+    if (!b.created || isNaN(d.getTime())) { return ''; }
+    try { return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }); }
+    catch (e) { return d.toLocaleString(); }
+  }
+  function backupWhen(b) { return backupDate(b) || b.name; }
+  function backupKind(b) { return Object.prototype.hasOwnProperty.call(BACKUP_KINDS, b.kind) ? BACKUP_KINDS[b.kind] : 'Other'; }
+
+  function countsText(counts) {
+    if (!counts || typeof counts !== 'object') { return ''; }
+    var parts = [];
+    COUNT_WORDS.forEach(function (w) {
+      var n = counts[w[0]];
+      /* non-breaking spaces: a line never ends between a number and its word */
+      if (typeof n === 'number' && isFinite(n)) { parts.push((n + ' ' + (n === 1 ? w[1] : w[2])).replace(/ /g, '\u00a0')); }
+    });
+    return parts.join(' · ');
+  }
+
+  function cleanBackups(list) {
+    if (!Array.isArray(list)) { return []; }
+    return list.filter(function (b) { return b && typeof b === 'object' && typeof b.name === 'string' && b.name; }).slice(0, 60).map(function (b) {
+      return {
+        name: b.name, kind: String(b.kind || 'other'), created: typeof b.created === 'string' ? b.created : '',
+        size: typeof b.size === 'number' && b.size >= 0 ? b.size : null,
+        counts: b.counts && typeof b.counts === 'object' ? b.counts : null
+      };
+    });
+  }
+
+  /* One wording for the failures every backups call can have; 401 is handled by the callers. */
+  function backupFailure(r, fallback) {
+    var message = r.data && typeof r.data.message === 'string' ? r.data.message : '';
+    if (r.status === 429) { return { kind: 'info', text: 'Please wait a moment — this was done just a few seconds ago. Try again in about a minute.' }; }
+    if (r.status >= 500) { return { kind: 'error', text: 'The server had a problem (HTTP ' + r.status + '). ' + fallback }; }
+    return { kind: 'error', text: (message ? message + ' ' : '') + fallback };
+  }
+  function backupNetwork(err, onTimeout, otherwise) {
+    return { kind: 'error', text: err && err.timeout ? onTimeout : 'Couldn’t reach the server. ' + otherwise };
+  }
+
+  function setBackupNote(note) {
+    bk.note = note;
+    renderBackups();
+    if (note) { announce(note.text); }
+  }
+
+  function loadBackups(quiet) {
+    if (bk.status === 'loading') { return; }
+    var hadList = bk.status === 'ready';
+    bk.status = 'loading';
+    bk.stale = false;
+    if (!(quiet && hadList)) { bk.list = []; }
+    renderBackups();
+    A.request('GET', '/api/backups', undefined, true).then(function (r) {
+      if (r.status === 401) { A.sessionExpired(null); return; }
+      if (!r.ok || !r.data || !Array.isArray(r.data.backups)) {
+        bk.status = 'error';
+        bk.list = [];
+        bk.error = r.ok ? 'The server’s answer could not be read.'
+          : r.status === 429 ? 'Too many requests. Please wait a moment and try again.'
+            : backupFailure(r, 'The backups could not be listed.').text;
+      } else {
+        bk.status = 'ready';
+        bk.list = cleanBackups(r.data.backups);
+        if (!quiet) { announce(bk.list.length ? plural(bk.list.length, 'backup') + ' listed.' : 'There are no backups yet.'); }
+      }
+      renderBackups();
+    }, function (err) {
+      bk.status = 'error';
+      bk.list = [];
+      bk.error = err && err.timeout ? 'The server did not answer in time.' : 'Couldn’t reach the server. Check your connection and try again.';
+      renderBackups();
+    });
+  }
+
+  function createBackup() {
+    if (bk.creating || bk.restoring) { return; }
+    bk.creating = true;
+    bk.note = null;
+    renderBackups();
+    A.request('POST', '/api/backups', undefined, true, { timeout: BACKUP_TIMEOUT_MS }).then(function (r) {
+      if (r.status === 401) { A.sessionExpired(null); return; }
+      bk.creating = false;
+      if (!r.ok) { setBackupNote(backupFailure(r, 'No backup was made; please try again.')); return; }
+      var made = cleanBackups([r.data && r.data.backup])[0];
+      setBackupNote({ kind: 'ok', text: 'Backup created' + (made ? ': ' + made.name : '') + '.' });
+      loadBackups(true);
+    }, function (err) {
+      bk.creating = false;
+      setBackupNote(backupNetwork(err, 'The server did not answer in time. Refresh the list to check whether the backup was made.', 'No backup was made; check your connection and try again.'));
+    });
+  }
+
+  /* Re-read every list this admin page shows (a restore replaces all of them). */
+  function reloadPageLists() {
+    var needsReload = false;
+    var seen = {};
+    Object.keys(ENTITIES).forEach(function (name) {
+      var info = ENTITIES[name];
+      if (info.page !== page || seen[info.key]) { return; }
+      seen[info.key] = true;
+      var ok = false;
+      try { ok = A.reload(info.key); } catch (e) { ok = false; }
+      if (!ok) { needsReload = true; }
+    });
+    return !needsReload;
+  }
+
+  function restoreBackup(b) {
+    if (bk.creating || bk.restoring) { return; }
+    var when = backupWhen(b);
+    var counts = countsText(b.counts);
+    A.confirmDialog({
+      title: 'Restore this backup?',
+      text: 'All site data will be replaced with this backup. The current data is backed up automatically first, so you can undo this by restoring that backup the same way.',
+      items: [when + ' — ' + backupKind(b), counts || 'Contents unknown'],
+      okLabel: 'Restore', danger: true
+    }).then(function (yes) {
+      if (!yes || bk.creating || bk.restoring) { return; }
+      bk.restoring = b.name;
+      bk.note = null;
+      renderBackups();
+      A.request('POST', '/api/backups/restore', { name: b.name }, true, { timeout: BACKUP_TIMEOUT_MS }).then(function (r) {
+        if (r.status === 401) { A.sessionExpired(null); return; }
+        bk.restoring = '';
+        if (!r.ok) { setBackupNote(backupFailure(r, 'Nothing was restored; the site data is unchanged.')); return; }
+        var safety = r.data && typeof r.data.pre_restore_backup === 'string' ? r.data.pre_restore_backup : '';
+        var refreshed = reloadPageLists();
+        setBackupNote({
+          kind: 'ok',
+          text: 'Restored the backup from ' + when + '.' +
+            (safety ? ' The data from just before was saved as ' + safety + ' — restore that one to undo.' : '') +
+            (refreshed ? ' The lists on this page were refreshed.' : ' Reload the page to see the restored data here (unsaved form input will be lost).'),
+          reload: !refreshed
+        });
+        loadBackups(true);
+      }, function (err) {
+        bk.restoring = '';
+        setBackupNote(backupNetwork(err, 'The server did not answer in time. Reload the page to check whether the restore happened before trying again.', 'Nothing was restored; check your connection and try again.'));
+      });
+    });
+  }
+
+  function backupItem(b) {
+    var when = backupDate(b);
+    var counts = countsText(b.counts);
+    var working = bk.restoring === b.name;
+    return el('li', { class: 'asst-backup' }, [
+      el('div', { class: 'asst-backup-text' }, [
+        el('p', { class: 'asst-backup-when', text: when || b.name }),
+        el('p', { class: 'asst-backup-kind' }, [
+          el('span', { class: 'asst-tag asst-tag--kind', text: backupKind(b) }),
+          b.size != null ? el('span', { class: 'asst-backup-size', text: formatBytes(b.size) }) : null
+        ]),
+        el('p', { class: 'asst-backup-counts' + (counts ? '' : ' is-unknown'), text: counts || 'Contents could not be read' })
+      ]),
+      el('button', {
+        type: 'button', class: 'btn btn--small btn--outline', 'data-key': 'b:' + b.name, text: working ? 'Restoring…' : 'Restore',
+        disabled: bk.creating || !!bk.restoring,
+        'aria-label': 'Restore the backup from ' + (when || b.name) + ' (' + backupKind(b) + ')',
+        on: { click: function () { restoreBackup(b); } }
+      })
+    ]);
+  }
+
+  function backupsBody() {
+    if (bk.status === 'error') {
+      return el('div', { class: 'asst-alert asst-alert--error', role: 'alert' }, [
+        svgIcon(ICON.warn),
+        el('div', { class: 'asst-alert-body' }, [
+          el('p', { class: 'asst-alert-title', text: 'Couldn’t load the backups' }),
+          el('p', { class: 'asst-alert-text', text: bk.error }),
+          el('div', { class: 'asst-alert-actions' }, [
+            el('button', { type: 'button', class: 'btn btn--small btn--outline', text: 'Try again', 'data-key': 'b-retry', on: { click: function () { loadBackups(false); } } })
+          ])
+        ])
+      ]);
+    }
+    if (bk.status !== 'ready' && !bk.list.length) {
+      return el('div', { class: 'asst-backups-loading' }, [
+        el('span', { class: 'asst-dots', 'aria-hidden': 'true' }, [el('span'), el('span'), el('span')]),
+        el('span', { text: 'Loading backups…' })
+      ]);
+    }
+    if (!bk.list.length) {
+      return el('div', { class: 'asst-empty' }, [
+        el('div', { class: 'asst-empty-icon' }, [svgIcon(ICON.backup)]),
+        el('p', { class: 'asst-empty-title', text: 'No backups yet' }),
+        el('p', { class: 'asst-empty-text', text: 'Press “Back up now” to save a copy of all site data. A copy is also saved automatically every day and before the assistant changes anything.' })
+      ]);
+    }
+    return el('ul', { class: 'asst-backup-list', 'aria-label': 'Backups, newest first' }, bk.list.map(backupItem));
+  }
+
+  function renderBackups() {
+    if (!ui.backups) { return; }
+    var active = document.activeElement;
+    var hadFocus = active && ui.backups.contains(active);
+    var key = hadFocus ? active.getAttribute('data-key') : null;
+    var top = ui.backups.scrollTop;
+    var n = bk.note;
+    var locked = bk.creating || !!bk.restoring;
+
+    clear(ui.backups);
+    ui.backups.appendChild(el('div', { class: 'asst-backups-bar' }, [
+      el('button', { type: 'button', class: 'asst-back', 'data-key': 'b-back', on: { click: function () { setView('chat', true); } } }, [svgIcon(ICON.back), 'Conversation']),
+      el('button', {
+        type: 'button', class: 'btn btn--small btn--solid', 'data-key': 'b-create', text: bk.creating ? 'Backing up…' : 'Back up now',
+        disabled: locked, on: { click: createBackup }
+      })
+    ]));
+    ui.backups.appendChild(el('p', { class: 'asst-backups-intro', text: 'Each backup is a full copy of the site data. Restoring one replaces everything on the site with that copy.' }));
+    if (n && n.text) {
+      ui.backups.appendChild(el('div', { class: 'asst-note asst-note--' + n.kind, role: n.kind === 'error' ? 'alert' : null }, [
+        el('span', { text: n.text }),
+        n.reload ? el('span', { class: 'asst-note-actions' }, [
+          el('button', { type: 'button', class: 'btn btn--small btn--outline', text: 'Reload page', 'data-key': 'b-reload', on: { click: function () { window.location.reload(); } } })
+        ]) : null
+      ]));
+    }
+    ui.backups.appendChild(backupsBody());
+    ui.backups.scrollTop = n ? 0 : top;
+
+    if (hadFocus) {
+      var again = null;
+      if (key) {
+        Array.prototype.forEach.call(ui.backups.querySelectorAll('[data-key]'), function (b) {
+          if (!again && !b.disabled && b.getAttribute('data-key') === key) { again = b; }
+        });
+      }
+      (again || ui.backups).focus({ preventScroll: true });
+    }
+  }
+
+  /* Switch between the conversation and the backups list; the conversation itself is untouched. */
+  function setView(next, moveFocus) {
+    view = next === 'backups' ? 'backups' : 'chat';
+    var backups = view === 'backups';
+    ui.log.hidden = backups;
+    ui.composer.hidden = backups;
+    ui.backups.hidden = !backups;
+    ui.fresh.hidden = backups;
+    ui.title.textContent = backups ? 'Backups' : 'Assistant';
+    ui.sub.textContent = backups ? 'Saved copies of all site data.' : 'Nothing is saved until you press Apply.';
+    var label = backups ? 'Back to the conversation' : 'Backups';
+    clear(ui.viewBtn);
+    ui.viewBtn.appendChild(svgIcon(ICON[backups ? 'chat' : 'backup']));
+    ui.viewBtn.setAttribute('aria-label', label);
+    ui.viewBtn.title = label;
+    if (backups) {
+      ui.drop.hidden = true;
+      if (bk.status === 'idle' || bk.status === 'error' || bk.stale) { loadBackups(bk.status === 'ready'); } else { renderBackups(); }
+      if (moveFocus) { ui.viewBtn.focus(); }
+    } else {
+      autosize();
+      ui.log.scrollTop = ui.log.scrollHeight;
+      if (moveFocus) { ui.input.focus(); }
+    }
+  }
+
   /* ---------- open / close ---------- */
 
   function setOpen(open, moveFocus) {
@@ -1021,9 +1324,13 @@
     if (open) {
       unread = false;
       syncLauncher();
-      autosize();
-      ui.log.scrollTop = ui.log.scrollHeight;
-      if (moveFocus) { ui.input.focus(); }
+      if (view === 'backups') {
+        if (moveFocus) { ui.viewBtn.focus(); }
+      } else {
+        autosize();
+        ui.log.scrollTop = ui.log.scrollHeight;
+        if (moveFocus) { ui.input.focus(); }
+      }
     } else if (moveFocus) {
       ui.launcher.focus();
     }
@@ -1070,6 +1377,10 @@
     ui.launcher.addEventListener('click', function () { setOpen(true, true); });
 
     ui.fresh = iconButton('fresh', 'New conversation', 'asst-head-btn', newConversation);
+    ui.viewBtn = iconButton('backup', 'Backups', 'asst-head-btn', function () { setView(view === 'backups' ? 'chat' : 'backups', true); });
+    ui.title = el('h2', { class: 'asst-title', text: 'Assistant' });
+    ui.sub = el('p', { class: 'asst-sub', text: 'Nothing is saved until you press Apply.' });
+    ui.backups = el('div', { class: 'asst-backups', role: 'region', 'aria-label': 'Backups', tabindex: '-1', hidden: true });
     ui.close = iconButton('close', 'Minimise the assistant', 'asst-head-btn', function () { setOpen(false, true); });
     ui.log = el('div', { class: 'asst-log', role: 'log', 'aria-label': 'Conversation', 'aria-live': 'off', tabindex: '-1' });
     ui.live = el('div', { class: 'sr-only', role: 'status', 'aria-live': 'polite' });
@@ -1093,14 +1404,12 @@
 
     ui.panel = el('section', { id: 'asst-panel', class: 'asst-panel', role: 'dialog', 'aria-label': 'Site assistant', hidden: true }, [
       el('header', { class: 'asst-head' }, [
-        el('div', { class: 'asst-head-text' }, [
-          el('h2', { class: 'asst-title', text: 'Assistant' }),
-          el('p', { class: 'asst-sub', text: 'Nothing is saved until you press Apply.' })
-        ]),
-        ui.fresh, ui.close
+        el('div', { class: 'asst-head-text' }, [ui.title, ui.sub]),
+        ui.fresh, ui.viewBtn, ui.close
       ]),
       ui.log,
-      el('div', { class: 'asst-composer' }, [
+      ui.backups,
+      ui.composer = el('div', { class: 'asst-composer' }, [
         ui.limit,
         ui.chips,
         ui.notice,
@@ -1151,6 +1460,7 @@
     /* --- drag and drop onto the panel --- */
     var dragDepth = 0;
     function hasFiles(e) {
+      if (view !== 'chat') { return false; }
       var types = e.dataTransfer && e.dataTransfer.types;
       return !!types && Array.prototype.indexOf.call(types, 'Files') !== -1;
     }
@@ -1226,6 +1536,7 @@
   document.addEventListener('dislab-admin-logout', function () {
     if (abortCtl) { abortCtl.abort(); }
     state.messages = []; state.draft = ''; state.open = false;
+    bk.list = []; bk.note = null; bk.status = 'idle';
     forget();
     /* the aborted request must not write the conversation back */
     save = function () {};
