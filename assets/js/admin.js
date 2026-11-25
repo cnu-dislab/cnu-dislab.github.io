@@ -45,6 +45,7 @@
   ];
 
   var forms = [];          /* every form on the page, for the unsaved-changes guard */
+  var reloaders = {};      /* panel key -> function that re-reads it from the API (used by the assistant) */
   var leaving = false;     /* true once we navigate away on purpose */
 
   /* ---------- storage ---------- */
@@ -114,7 +115,10 @@
 
   /* ---------- API ---------- */
 
-  function request(method, path, body, withAuth) {
+  /* opts (optional): { timeout: ms, signal: AbortSignal } — used by the assistant for long calls. */
+  function request(method, path, body, withAuth, opts) {
+    opts = opts || {};
+    var timedOut = false;
     var headers = {};
     var init = { method: method, headers: headers, cache: 'no-store' };
     if (body !== undefined) {
@@ -127,7 +131,11 @@
     }
     var controller = window.AbortController ? new AbortController() : null;
     if (controller) { init.signal = controller.signal; }
-    var timer = setTimeout(function () { if (controller) { controller.abort(); } }, TIMEOUT_MS);
+    var timer = setTimeout(function () { timedOut = true; if (controller) { controller.abort(); } }, opts.timeout || TIMEOUT_MS);
+    if (opts.signal && controller) {
+      if (opts.signal.aborted) { controller.abort(); }
+      else { opts.signal.addEventListener('abort', function () { controller.abort(); }, { once: true }); }
+    }
 
     return fetch(API + path, init).then(function (res) {
       return res.text().then(function (text) {
@@ -138,6 +146,8 @@
     }, function () {
       var err = new Error('Could not reach the server. Check your connection and try again.');
       err.network = true;
+      err.timeout = timedOut;
+      err.aborted = !timedOut && !!(opts.signal && opts.signal.aborted);
       throw err;
     }).then(function (r) { clearTimeout(timer); return r; }, function (e) { clearTimeout(timer); throw e; });
   }
@@ -477,6 +487,12 @@
         body.appendChild(stateBlock('error', 'Couldn’t load ' + cfg.label, err.message, load));
       });
     }
+    /* Unsaved input is never overwritten: the caller offers a page reload instead. */
+    reloaders[cfg.key] = function () {
+      if (form.dirty || form.busy) { return false; }
+      load();
+      return true;
+    };
     load();
     return p.node;
   }
@@ -685,6 +701,19 @@
     });
     filterInput.addEventListener('input', function () { query = filterInput.value; renderRows(); });
 
+    /* Re-read the list after a change made outside this form (the assistant). If the record
+       being edited is still pristine, show its new values; typed input is left alone. */
+    reloaders[cfg.key] = function () {
+      load(true).then(function () {
+        if (editingId == null) { return; }
+        var fresh = items.filter(function (i) { return i.id === editingId; })[0];
+        if (!fresh) { return; }
+        if (form.dirty) { editNote.textContent = 'The list was just updated. Saving this form replaces the whole record with what is typed here.'; }
+        else { setMode(fresh); }
+      });
+      return true;
+    };
+
     var draft = takeDraft(cfg.key);
     if (draft) {
       if (typeof draft.id === 'number') { setMode({ id: draft.id }, draft.values); }
@@ -770,6 +799,7 @@
       button.disabled = true;
       button.textContent = 'Logging out…';
       function done() {
+        try { document.dispatchEvent(new CustomEvent('dislab-admin-logout')); } catch (e) { /* ignore */ }
         clearToken();
         sDel('sessionStorage', DRAFT_KEY);
         sDel('sessionStorage', RETURN_KEY);
@@ -811,6 +841,9 @@
         shell.logoutBtn.disabled = false;
         clear(shell.root);
         page.render().forEach(function (node) { shell.root.appendChild(node); });
+        /* Session confirmed: let add-ons (assets/js/admin-assistant.js) start. */
+        window.DISADMIN.user = String((r.data && r.data.username) || 'admin');
+        try { document.dispatchEvent(new CustomEvent('dislab-admin-ready')); } catch (e) { /* ignore */ }
       }).catch(function (err) {
         shell.userLabel.textContent = 'Not verified';
         shell.logoutBtn.disabled = false;
@@ -937,6 +970,12 @@
     single: single,
     linkCell: linkCell,
     thumbCell: thumbCell,
-    stack: stack
+    stack: stack,
+    /* For assets/js/admin-assistant.js */
+    user: null,
+    request: request,
+    sessionExpired: sessionExpired,
+    confirmDialog: confirmDialog,
+    reload: function (key) { return typeof reloaders[key] === 'function' ? reloaders[key]() !== false : false; }
   };
 })();
